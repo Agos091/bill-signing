@@ -88,8 +88,23 @@ jobs:
           name: frontend-coverage
           path: coverage/
 
+      - name: Verify coverage files exist
+        run: |
+          echo "Checking coverage files..."
+          ls -la coverage/ || echo "Frontend coverage directory not found"
+          ls -la server/coverage/ || echo "Backend coverage directory not found"
+          test -f coverage/lcov.info && echo "✓ Frontend lcov.info exists" || echo "✗ Frontend lcov.info missing"
+          test -f server/coverage/lcov.info && echo "✓ Backend lcov.info exists" || echo "✗ Backend lcov.info missing"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@ba3875ecf642b2129de2b589510c81a8b53dbf4e
+        with:
+          projectBaseDir: .
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
