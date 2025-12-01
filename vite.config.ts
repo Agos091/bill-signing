@@ -9,9 +9,12 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    exclude: ['node_modules', 'dist', 'server'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
+      reportsDirectory: './coverage',
       exclude: [
         'node_modules/',
         'src/test/',
@@ -20,6 +23,7 @@ export default defineConfig({
         '**/mockData.ts',
         '**/mocks/**',
         'dist/',
+        'server/',
       ],
       thresholds: {
         lines: 25,
