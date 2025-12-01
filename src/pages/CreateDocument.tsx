@@ -7,13 +7,14 @@ import { FileUpload, type UploadedFile } from '../components/FileUpload';
 
 export function CreateDocument() {
   const navigate = useNavigate();
-  const { createDocument, users, isLoading } = useApp();
+  const { createDocument, isLoading } = useApp();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [expiresAt, setExpiresAt] = useState('');
   const [signatures, setSignatures] = useState<Array<{ userEmail: string; userName: string }>>([]);
   const [newSignatureEmail, setNewSignatureEmail] = useState('');
   const [newSignatureName, setNewSignatureName] = useState('');
+  const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
 
   const handleAddSignature = () => {
     if (!newSignatureEmail || !newSignatureName) {

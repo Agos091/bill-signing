@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
-import type { Document } from '../types';
 
 export function EditDocument() {
   const { id } = useParams<{ id: string }>();

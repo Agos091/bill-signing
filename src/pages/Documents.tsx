@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Search, Plus, Calendar, Clock, User, CheckCircle2, XCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import type { Document, DocumentStatus } from '../types';
+import type { DocumentStatus } from '../types';
 
 const statusConfig = {
   pending: {

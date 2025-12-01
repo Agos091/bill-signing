@@ -140,7 +140,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         isLoading: api.isLoading,
         isDarkMode,
         toggleDarkMode: () => {
-          setIsDarkMode((prev) => {
+          setIsDarkMode((prev: boolean) => {
             const newValue = !prev;
             // Sincroniza com appSettings se existir
             const settingsStored = localStorage.getItem('appSettings');
