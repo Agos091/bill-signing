@@ -44,11 +44,15 @@ O servidor estará disponível em `http://localhost:3001`
 
 ### Servidor MCP
 
+**Modo stdio (local):**
 ```bash
 yarn mcp
 ```
 
-O servidor MCP roda via stdio e pode ser conectado a clientes MCP.
+O servidor MCP roda via stdio e pode ser conectado a clientes MCP locais.
+
+**Modo HTTP (remoto):**
+O servidor MCP também está disponível via HTTP quando o servidor Express está rodando. Veja os endpoints abaixo.
 
 ## 📡 Endpoints da API
 
@@ -70,6 +74,13 @@ O servidor MCP roda via stdio e pode ser conectado a clientes MCP.
 - `GET /api/users` - Lista todos os usuários
 - `GET /api/users/current` - Obtém usuário atual
 - `GET /api/users/:id` - Obtém um usuário específico
+
+### MCP (HTTP)
+
+- `GET /api/mcp/tools` - Lista todas as ferramentas MCP disponíveis
+- `POST /api/mcp/call` - Chama uma ferramenta MCP (body: `{ name: string, arguments: object }`)
+- `GET /api/mcp/resources` - Lista recursos disponíveis
+- `GET /api/mcp/resources/:uri` - Lê um recurso específico
 
 ## 🔧 Ferramentas MCP
 
@@ -104,6 +115,16 @@ server/
 │   └── data/                 # Dados mock
 └── package.json
 ```
+
+## 🚀 Deploy
+
+Para fazer deploy do servidor em produção, consulte o guia completo em [DEPLOY.md](./DEPLOY.md).
+
+**Plataformas recomendadas:**
+- **Railway** (recomendado) - Deploy simples via Git
+- **Render** - Plano gratuito disponível
+- **Fly.io** - Boa para aplicações globais
+- **Docker** - Para deploy em qualquer plataforma
 
 ## 🔐 Segurança
 

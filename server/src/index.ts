@@ -5,6 +5,7 @@ import path from 'path';
 import documentsRouter from './routes/documents.js';
 import usersRouter from './routes/users.js';
 import uploadRouter from './routes/upload.js';
+import mcpRouter from './routes/mcp.js';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.get('/health', (req, res) => {
 app.use('/api/documents', documentsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/mcp', mcpRouter);
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
