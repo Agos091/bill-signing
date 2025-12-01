@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import authRouter from './routes/auth.js';
 import documentsRouter from './routes/documents.js';
 import usersRouter from './routes/users.js';
 import uploadRouter from './routes/upload.js';
@@ -14,9 +15,12 @@ const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
 
 // Middleware
-app.use(cors({ origin: CORS_ORIGIN }));
+app.use(cors({ 
+  origin: CORS_ORIGIN.split(',').map(o => o.trim()),
+  credentials: true,
+}));
 
-// JSON parser - permite body vazio
+// JSON parser
 app.use(express.json({ 
   strict: false,
   limit: '10mb'
@@ -27,26 +31,25 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const uploadsDir = path.join(process.cwd(), 'uploads');
 app.use('/uploads', express.static(uploadsDir));
 
-// Health check
+// Health check (público)
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Routes
-app.use('/api/documents', documentsRouter);
-app.use('/api/users', usersRouter);
-app.use('/api/upload', uploadRouter);
-app.use('/api/mcp', mcpRouter);
+app.use('/api/auth', authRouter);      // Rotas de autenticação (públicas)
+app.use('/api/documents', documentsRouter);  // Rotas de documentos (protegidas)
+app.use('/api/users', usersRouter);          // Rotas de usuários (protegidas)
+app.use('/api/upload', uploadRouter);        // Rotas de upload
+app.use('/api/mcp', mcpRouter);              // Rotas MCP
 
-// Error handling middleware (deve vir DEPOIS das rotas)
+// Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  // Erro de parsing JSON
   if (err instanceof SyntaxError || (err && err.type === 'entity.parse.failed')) {
     console.error('Erro ao fazer parse do JSON:', err.message);
     return res.status(400).json({ error: 'JSON inválido no body da requisição' });
   }
   
-  // Outros erros
   console.error('Erro:', err);
   res.status(500).json({ error: 'Erro interno do servidor' });
 });
@@ -54,6 +57,6 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
   console.log(`📋 API disponível em http://localhost:${PORT}/api`);
+  console.log(`🔐 Auth: http://localhost:${PORT}/api/auth`);
   console.log(`🔍 Health check: http://localhost:${PORT}/health`);
 });
-

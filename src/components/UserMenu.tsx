@@ -1,13 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { User, Settings, LogOut, Moon, Sun, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 
 export function UserMenu() {
   const { currentUser, isDarkMode, toggleDarkMode } = useApp();
+  const { logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // Se não há usuário logado, não renderiza o menu
+  if (!currentUser) {
+    return null;
+  }
 
   // Fecha o menu ao clicar fora
   useEffect(() => {
@@ -25,6 +33,17 @@ export function UserMenu() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logout realizado com sucesso!');
+      navigate('/login');
+    } catch (error) {
+      toast.error('Erro ao fazer logout');
+    }
+    setIsOpen(false);
+  };
 
   const menuItems = [
     {
@@ -54,11 +73,7 @@ export function UserMenu() {
     {
       icon: LogOut,
       label: 'Sair',
-      onClick: () => {
-        // Aqui você pode adicionar lógica de logout
-        console.log('Logout');
-        setIsOpen(false);
-      },
+      onClick: handleLogout,
       divider: true,
     },
   ];
@@ -123,4 +138,3 @@ export function UserMenu() {
     </div>
   );
 }
-

@@ -1,5 +1,6 @@
-  import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
@@ -9,22 +10,168 @@ import { EditDocument } from './pages/EditDocument';
 import { CreateDocument } from './pages/CreateDocument';
 import { Settings } from './pages/Settings';
 import { AIAssistant } from './pages/AIAssistant';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
+
+// Componente de rota protegida
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// Componente de rota pública (redireciona se já logado)
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Rotas públicas */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute>
+            <Signup />
+          </PublicRoute>
+        }
+      />
+
+      {/* Rotas protegidas */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <AppProvider>
+              <Layout>
+                <Home />
+              </Layout>
+            </AppProvider>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/documents"
+        element={
+          <ProtectedRoute>
+            <AppProvider>
+              <Layout>
+                <Documents />
+              </Layout>
+            </AppProvider>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/documents/:id"
+        element={
+          <ProtectedRoute>
+            <AppProvider>
+              <Layout>
+                <DocumentDetails />
+              </Layout>
+            </AppProvider>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/documents/:id/edit"
+        element={
+          <ProtectedRoute>
+            <AppProvider>
+              <Layout>
+                <EditDocument />
+              </Layout>
+            </AppProvider>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/create"
+        element={
+          <ProtectedRoute>
+            <AppProvider>
+              <Layout>
+                <CreateDocument />
+              </Layout>
+            </AppProvider>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai"
+        element={
+          <ProtectedRoute>
+            <AppProvider>
+              <Layout>
+                <AIAssistant />
+              </Layout>
+            </AppProvider>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <AppProvider>
+              <Layout>
+                <Settings />
+              </Layout>
+            </AppProvider>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Redireciona rotas não encontradas para home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
 
 function App() {
   return (
-    <AppProvider>
+    <AuthProvider>
       <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/documents" element={<Documents />} />
-            <Route path="/documents/:id" element={<DocumentDetails />} />
-            <Route path="/documents/:id/edit" element={<EditDocument />} />
-            <Route path="/create" element={<CreateDocument />} />
-            <Route path="/ai" element={<AIAssistant />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
-        </Layout>
+        <AppRoutes />
         <Toaster
           position="top-right"
           toastOptions={{
@@ -48,7 +195,7 @@ function App() {
           }}
         />
       </BrowserRouter>
-    </AppProvider>
+    </AuthProvider>
   );
 }
 

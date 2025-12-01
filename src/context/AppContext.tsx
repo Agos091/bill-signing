@@ -1,11 +1,11 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { Document, User, CreateDocumentData } from '../types';
-import { initialDocuments, currentUser, mockUsers } from '../mocks/data';
-import { useMockApi } from '../hooks/useMockApi';
+import { useApi } from '../hooks/useApi';
+import { useAuth } from './AuthContext';
 
 interface AppContextType {
   documents: Document[];
-  currentUser: User;
+  currentUser: User | null;
   users: User[];
   isLoading: boolean;
   isDarkMode: boolean;
@@ -20,18 +20,10 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  // Carrega documentos diretamente na inicialização do estado
-  const [documents, setDocuments] = useState<Document[]>(() => {
-    const stored = localStorage.getItem('documents');
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
+  const { user: authUser } = useAuth();
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const stored = localStorage.getItem('darkMode');
@@ -42,45 +34,48 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return false;
       }
     }
-    // Verifica também nas settings unificadas
-    const settingsStored = localStorage.getItem('appSettings');
-    if (settingsStored) {
-      try {
-        const settings = JSON.parse(settingsStored);
-        return settings.darkMode ?? false;
-      } catch {
-        return false;
-      }
-    }
     return false;
   });
   
-  const api = useMockApi();
+  const api = useApi();
+
+  // Carrega dados iniciais do backend
+  const loadInitialData = useCallback(async () => {
+    if (!authUser) {
+      setIsInitialized(true);
+      return;
+    }
+
+    try {
+      const [docsData, usersData] = await Promise.all([
+        api.fetchDocuments(),
+        api.fetchUsers(),
+      ]);
+      
+      setDocuments(docsData);
+      setUsers(usersData);
+      setIsInitialized(true);
+    } catch (error) {
+      console.error('Erro ao carregar dados iniciais:', error);
+      setIsInitialized(true);
+    }
+  }, [api, authUser]);
 
   const refreshDocuments = useCallback(async () => {
-    const docs = await api.fetchDocuments();
-    setDocuments(docs);
+    try {
+      const docs = await api.fetchDocuments();
+      setDocuments(docs);
+    } catch (error) {
+      console.error('Erro ao atualizar documentos:', error);
+    }
   }, [api]);
 
+  // Inicialização
   useEffect(() => {
-    // Aplica tema na inicialização
-    const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    loadInitialData();
+  }, [loadInitialData]);
 
-    // Inicializa documentos no localStorage se não existirem
-    const stored = localStorage.getItem('documents');
-    if (!stored) {
-      localStorage.setItem('documents', JSON.stringify(initialDocuments));
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
-      setDocuments(initialDocuments);
-    }
-    // Se já existem, os documentos já foram carregados no useState inicial
-  }, []);
-
+  // Aplica tema
   useEffect(() => {
     const root = document.documentElement;
     if (isDarkMode) {
@@ -89,20 +84,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       root.classList.remove('dark');
     }
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
-    
-    // Sincroniza com appSettings se existir
-    const settingsStored = localStorage.getItem('appSettings');
-    if (settingsStored) {
-      try {
-        const settings = JSON.parse(settingsStored);
-        settings.darkMode = isDarkMode;
-        localStorage.setItem('appSettings', JSON.stringify(settings));
-      } catch {
-        // Ignora erro
-      }
-    }
   }, [isDarkMode]);
-
 
   const handleCreateDocument = async (data: CreateDocumentData) => {
     const doc = await api.createDocument(data);
@@ -131,31 +113,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return doc;
   };
 
+  const toggleDarkMode = useCallback(() => {
+    setIsDarkMode((prev: boolean) => !prev);
+  }, []);
+
+  // Mostra loading enquanto inicializa
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AppContext.Provider
       value={{
         documents,
-        currentUser,
-        users: mockUsers,
+        currentUser: authUser,
+        users,
         isLoading: api.isLoading,
         isDarkMode,
-        toggleDarkMode: () => {
-          setIsDarkMode((prev: boolean) => {
-            const newValue = !prev;
-            // Sincroniza com appSettings se existir
-            const settingsStored = localStorage.getItem('appSettings');
-            if (settingsStored) {
-              try {
-                const settings = JSON.parse(settingsStored);
-                settings.darkMode = newValue;
-                localStorage.setItem('appSettings', JSON.stringify(settings));
-              } catch {
-                // Ignora erro
-              }
-            }
-            return newValue;
-          });
-        },
+        toggleDarkMode,
         refreshDocuments,
         createDocument: handleCreateDocument,
         updateDocument: handleUpdateDocument,

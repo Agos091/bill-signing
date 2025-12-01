@@ -1,13 +1,41 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
+// Função para obter o token do localStorage
+function getAuthToken(): string | null {
+  const stored = localStorage.getItem('bill-signing-auth');
+  if (stored) {
+    try {
+      const { session } = JSON.parse(stored);
+      return session?.access_token || null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 export const apiClient = {
   async get<T>(endpoint: string): Promise<T> {
+    const token = getAuthToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
     });
+
+    if (response.status === 401) {
+      // Token expirado ou inválido
+      localStorage.removeItem('bill-signing-auth');
+      window.location.href = '/login';
+      throw new Error('Sessão expirada');
+    }
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
@@ -18,13 +46,26 @@ export const apiClient = {
   },
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
+    const token = getAuthToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: data ? JSON.stringify(data) : undefined,
     });
+
+    if (response.status === 401) {
+      localStorage.removeItem('bill-signing-auth');
+      window.location.href = '/login';
+      throw new Error('Sessão expirada');
+    }
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
@@ -35,13 +76,26 @@ export const apiClient = {
   },
 
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
+    const token = getAuthToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: data ? JSON.stringify(data) : undefined,
     });
+
+    if (response.status === 401) {
+      localStorage.removeItem('bill-signing-auth');
+      window.location.href = '/login';
+      throw new Error('Sessão expirada');
+    }
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
@@ -52,12 +106,25 @@ export const apiClient = {
   },
 
   async delete<T>(endpoint: string): Promise<T> {
+    const token = getAuthToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
     });
+
+    if (response.status === 401) {
+      localStorage.removeItem('bill-signing-auth');
+      window.location.href = '/login';
+      throw new Error('Sessão expirada');
+    }
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
@@ -71,4 +138,3 @@ export const apiClient = {
     return response.json();
   },
 };
-
