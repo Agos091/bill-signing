@@ -112,7 +112,11 @@ export class FileProcessor {
     try {
       await fs.unlink(filePath);
     } catch (error) {
-      console.error('Erro ao deletar arquivo:', error);
+      // Ignora erro se arquivo não existe
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        console.error('Erro ao deletar arquivo:', error);
+        throw error;
+      }
     }
   }
 

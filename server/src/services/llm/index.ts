@@ -4,6 +4,11 @@ import { AnthropicProvider } from './anthropicProvider.js';
 
 let cachedProvider: LLMProvider | null = null;
 
+// Função para resetar o cache do provider (útil para desenvolvimento)
+export function resetLLMProviderCache(): void {
+  cachedProvider = null;
+}
+
 export function createLLMProvider(): LLMProvider {
   // Cache do provider para evitar múltiplas instâncias
   if (cachedProvider) {
@@ -16,22 +21,26 @@ export function createLLMProvider(): LLMProvider {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       console.warn('⚠️  ANTHROPIC_API_KEY não configurada, usando mock provider');
-      cachedProvider = createMockProvider();
-      return cachedProvider;
+      const mockProvider = createMockProvider();
+      cachedProvider = mockProvider;
+      return mockProvider;
     }
-    cachedProvider = new AnthropicProvider(apiKey);
-    return cachedProvider;
+    const anthropicProvider = new AnthropicProvider(apiKey);
+    cachedProvider = anthropicProvider;
+    return anthropicProvider;
   }
 
   // Default: OpenAI
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     console.warn('⚠️  OPENAI_API_KEY não configurada, usando mock provider');
-    cachedProvider = createMockProvider();
-    return cachedProvider;
+    const mockProvider = createMockProvider();
+    cachedProvider = mockProvider;
+    return mockProvider;
   }
-  cachedProvider = new OpenAIProvider(apiKey);
-  return cachedProvider;
+  const providerInstance = new OpenAIProvider(apiKey);
+  cachedProvider = providerInstance;
+  return providerInstance;
 }
 
 // Mock provider para desenvolvimento sem API key

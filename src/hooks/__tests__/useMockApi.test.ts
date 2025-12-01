@@ -1,32 +1,37 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { renderHook } from '@testing-library/react';
 import { useMockApi } from '../useMockApi';
 
 describe('useMockApi', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('should return api methods', () => {
-    const api = useMockApi();
-    expect(api).toBeDefined();
-    expect(api.fetchDocuments).toBeDefined();
-    expect(api.createDocument).toBeDefined();
-    expect(api.updateDocument).toBeDefined();
-    expect(api.deleteDocument).toBeDefined();
-    expect(api.signDocument).toBeDefined();
-    expect(typeof api.isLoading).toBe('boolean');
+    const { result } = renderHook(() => useMockApi());
+    expect(result.current).toBeDefined();
+    expect(result.current.fetchDocuments).toBeDefined();
+    expect(result.current.createDocument).toBeDefined();
+    expect(result.current.updateDocument).toBeDefined();
+    expect(result.current.deleteDocument).toBeDefined();
+    expect(result.current.signDocument).toBeDefined();
+    expect(typeof result.current.isLoading).toBe('boolean');
   });
 
   it('should fetch documents', async () => {
-    const api = useMockApi();
-    const documents = await api.fetchDocuments();
+    const { result } = renderHook(() => useMockApi());
+    const documents = await result.current.fetchDocuments();
     expect(Array.isArray(documents)).toBe(true);
   });
 
   it('should create document', async () => {
-    const api = useMockApi();
+    const { result } = renderHook(() => useMockApi());
     const newDoc = {
       title: 'Test Document',
       description: 'Test Description',
       signatures: [{ userName: 'John', userEmail: 'john@test.com' }],
     };
-    const doc = await api.createDocument(newDoc);
+    const doc = await result.current.createDocument(newDoc);
     expect(doc).toBeDefined();
     expect(doc.title).toBe('Test Document');
   });

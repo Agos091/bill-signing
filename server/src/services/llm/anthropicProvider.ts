@@ -49,9 +49,12 @@ Forneça uma resposta JSON com a seguinte estrutura:
         suggestions: result.suggestions || [],
         estimatedReadingTime: result.estimatedReadingTime,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao analisar documento com Anthropic:', error);
-      throw new Error('Falha ao analisar documento');
+      const errorMessage = error?.message || 'Erro desconhecido';
+      const errorCode = error?.status || error?.code || 'UNKNOWN';
+      console.error(`Código do erro: ${errorCode}, Mensagem: ${errorMessage}`);
+      throw new Error(`Falha ao analisar documento: ${errorMessage} (${errorCode})`);
     }
   }
 

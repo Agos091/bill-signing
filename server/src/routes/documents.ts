@@ -155,19 +155,35 @@ router.post('/:id/sign', async (req: Request, res: Response) => {
 router.post('/:id/analyze', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
+    if (!id) {
+      return res.status(400).json({ error: 'ID do documento é obrigatório' });
+    }
+
     const document = db.getDocumentById(id);
 
     if (!document) {
       return res.status(404).json({ error: 'Documento não encontrado' });
     }
 
+    // Prepara o conteúdo para análise
     const content = `${document.title}\n\n${document.description}`;
+    
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({ error: 'Documento não possui conteúdo para análise' });
+    }
+
+    // Analisa o documento usando LLM
     const analysis = await getLLMProvider().analyzeDocument(content);
 
     res.json(analysis);
   } catch (error) {
     console.error('Erro ao analisar documento:', error);
-    res.status(500).json({ error: 'Erro ao analisar documento' });
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    res.status(500).json({ 
+      error: 'Erro ao analisar documento',
+      details: errorMessage 
+    });
   }
 });
 
