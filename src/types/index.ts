@@ -40,4 +40,5 @@ export interface CreateDocumentData {
     userName: string;
   }>;
   expiresAt?: string;
+  fileUrl?: string;
 }

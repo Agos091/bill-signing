@@ -54,10 +54,13 @@ router.post('/', (req: Request, res: Response) => {
     const currentUser = db.getCurrentUser();
     const newDocument: Document = {
       id: uuidv4(),
-      ...data,
+      title: data.title,
+      description: data.description,
       status: 'pending',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      expiresAt: data.expiresAt,
+      fileUrl: data.fileUrl,
       createdBy: currentUser,
       signatures: data.signatures.map((sig, idx) => ({
         id: `sig-${Date.now()}-${idx}`,

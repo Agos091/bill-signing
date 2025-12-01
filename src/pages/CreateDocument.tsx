@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
+import { FileUpload, type UploadedFile } from '../components/FileUpload';
 
 export function CreateDocument() {
   const navigate = useNavigate();
@@ -37,8 +38,15 @@ export function CreateDocument() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !description) {
-      toast.error('Preencha todos os campos obrigatórios');
+    // Validação: título ou arquivo é obrigatório
+    if (!title && !uploadedFile) {
+      toast.error('Preencha o título ou anexe um arquivo');
+      return;
+    }
+
+    // Validação: descrição ou arquivo é obrigatório
+    if (!description && !uploadedFile) {
+      toast.error('Preencha a descrição ou anexe um arquivo');
       return;
     }
 
@@ -48,11 +56,19 @@ export function CreateDocument() {
     }
 
     try {
+      // Se houver arquivo, usa o conteúdo extraído como descrição se descrição estiver vazia
+      let finalDescription = description;
+      if (uploadedFile && !description.trim()) {
+        // Usa as primeiras 500 caracteres do conteúdo extraído
+        finalDescription = uploadedFile.content.substring(0, 500) + (uploadedFile.content.length > 500 ? '...' : '');
+      }
+
       await createDocument({
-        title,
-        description,
+        title: title || uploadedFile?.filename || 'Novo Documento',
+        description: finalDescription,
         signatures,
         expiresAt: expiresAt || undefined,
+        fileUrl: uploadedFile?.url,
       });
       toast.success('Documento criado com sucesso!');
       navigate('/documents');
@@ -75,7 +91,7 @@ export function CreateDocument() {
       <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm space-y-6">
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Título *
+            Título {!uploadedFile && '*'}
           </label>
           <input
             id="title"
@@ -84,13 +100,13 @@ export function CreateDocument() {
             onChange={(e) => setTitle(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="Ex: Contrato de Prestação de Serviços"
-            required
+            required={!uploadedFile}
           />
         </div>
 
         <div>
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Descrição *
+            Descrição {!uploadedFile && '*'}
           </label>
           <textarea
             id="description"
@@ -98,9 +114,31 @@ export function CreateDocument() {
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-            placeholder="Descreva o conteúdo do documento..."
-            required
+            placeholder={uploadedFile ? "Descreva o conteúdo do documento (opcional se arquivo foi enviado)..." : "Descreva o conteúdo do documento..."}
+            required={!uploadedFile}
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Anexar Arquivo (opcional)
+          </label>
+          <FileUpload
+            onFileUploaded={(file) => {
+              setUploadedFile(file);
+              // Preenche título e descrição automaticamente se estiverem vazios
+              if (!title && file.filename) {
+                setTitle(file.filename.replace(/\.[^/.]+$/, ''));
+              }
+              if (!description && file.content) {
+                setDescription(file.content.substring(0, 500) + (file.content.length > 500 ? '...' : ''));
+              }
+            }}
+            onFileRemoved={() => setUploadedFile(null)}
+          />
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            Formatos suportados: PDF, CSV, TXT, MD, DOC, DOCX, XLS, XLSX (máx. 10MB)
+          </p>
         </div>
 
         <div>

@@ -1,8 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import documentsRouter from './routes/documents.js';
 import usersRouter from './routes/users.js';
+import uploadRouter from './routes/upload.js';
 
 dotenv.config();
 
@@ -14,6 +16,10 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
 app.use(cors({ origin: CORS_ORIGIN }));
 app.use(express.json());
 
+// Servir arquivos estáticos da pasta uploads
+const uploadsDir = path.join(process.cwd(), 'uploads');
+app.use('/uploads', express.static(uploadsDir));
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -22,6 +28,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/documents', documentsRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/upload', uploadRouter);
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
