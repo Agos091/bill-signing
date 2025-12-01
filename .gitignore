@@ -28,3 +28,12 @@ dist-ssr
 .env.local
 .env.production.local
 .env.development.local
+
+# Test coverage
+coverage/
+server/coverage/
+*.lcov
+.nyc_output
+
+# Sonar
+.sonar/
