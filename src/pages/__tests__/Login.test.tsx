@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Login } from '../Login';
 import { AuthProvider } from '../../context/AuthContext';
-import * as supabaseModule from '../../config/supabase';
 
 // Mock do react-router-dom
 const mockNavigate = vi.fn();
