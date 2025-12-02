@@ -84,65 +84,68 @@ export function DocumentDetails() {
   const statusStyle = statusConfig[document.status];
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center space-x-4">
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex items-center gap-4">
         <button
           onClick={() => navigate('/documents')}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="p-3 rounded-2xl border border-[#EAF2FF] bg-white hover:bg-[#F5F9FF] shadow-[0_15px_30px_rgba(15,23,42,0.08)] text-[#0A84FF] transition"
         >
-          <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          <ArrowLeft className="w-5 h-5" />
         </button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Detalhes do Documento
+        <div className="flex-1 space-y-1">
+          <p className="text-xs uppercase tracking-[0.4em] text-blue-500">Documento</p>
+          <h1 className="text-3xl font-semibold text-[#0A192F]">
+            Detalhes do documento
           </h1>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+      <div className="bg-white rounded-[32px] border border-[#E0EDFF] p-8 shadow-[0_25px_70px_rgba(10,132,255,0.08)] space-y-8">
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
-            <div className="flex items-center space-x-3 mb-4">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <h2 className="text-3xl font-semibold text-[#0A192F]">
                 {document.title}
               </h2>
-              <span className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusStyle.color}`}>
-                <StatusIcon className="w-4 h-4" />
-                <span>{statusStyle.label}</span>
+              <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium ${statusStyle.color}`}>
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/80 text-current">
+                  <StatusIcon className="w-3 h-3" />
+                </span>
+                {statusStyle.label}
               </span>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-500 mb-6">
               {document.description}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center space-x-3">
-            <Calendar className="w-5 h-5 text-gray-400" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 pb-6 border-b border-[#EAF2FF]">
+          <div className="flex items-center gap-3">
+            <Calendar className="w-5 h-5 text-[#0A84FF]" />
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Criado em</p>
-              <p className="text-gray-900 dark:text-white font-medium">
+              <p className="text-sm text-gray-400">Criado em</p>
+              <p className="text-[#0A192F] font-medium">
                 {formatDate(document.createdAt)}
               </p>
             </div>
           </div>
           {document.expiresAt && (
-            <div className="flex items-center space-x-3">
-              <Calendar className="w-5 h-5 text-gray-400" />
+            <div className="flex items-center gap-3">
+              <Calendar className="w-5 h-5 text-[#0A84FF]" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Expira em</p>
-                <p className="text-gray-900 dark:text-white font-medium">
+                <p className="text-sm text-gray-400">Expira em</p>
+                <p className="text-[#0A192F] font-medium">
                   {formatDate(document.expiresAt)}
                 </p>
               </div>
             </div>
           )}
-          <div className="flex items-center space-x-3">
-            <User className="w-5 h-5 text-gray-400" />
+          <div className="flex items-center gap-3">
+            <User className="w-5 h-5 text-[#0A84FF]" />
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Criado por</p>
-              <p className="text-gray-900 dark:text-white font-medium">
+              <p className="text-sm text-gray-400">Criado por</p>
+              <p className="text-[#0A192F] font-medium">
                 {document.createdBy.name}
               </p>
             </div>
@@ -157,26 +160,26 @@ export function DocumentDetails() {
             {document.signatures.map((signature) => (
               <div
                 key={signature.id}
-                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                className="flex items-center justify-between p-4 bg-[#F5F9FF] rounded-2xl border border-[#EAF2FF]"
               >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
-                    <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#0A84FF] to-[#4BC0FF] flex items-center justify-center text-white">
+                    <User className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className="font-medium text-[#0A192F]">
                       {signature.userName}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500">
                       {signature.userEmail}
                     </p>
                     {signature.signedAt && (
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                      <p className="text-xs text-gray-400 mt-1">
                         Assinado em {formatDate(signature.signedAt)}
                       </p>
                     )}
                     {signature.comment && (
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 italic">
+                      <p className="text-sm text-gray-600 mt-1 italic">
                         "{signature.comment}"
                       </p>
                     )}
@@ -186,19 +189,19 @@ export function DocumentDetails() {
                   {signature.status === 'pending' ? (
                     <button
                       onClick={() => handleSign(signature.id)}
-                      className="inline-flex items-center space-x-1 px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#0A84FF] to-[#4BC0FF] text-white rounded-full text-sm font-medium shadow-[0_10px_30px_rgba(10,132,255,0.2)] transition"
                       disabled={isLoading}
                     >
                       <Pen className="w-4 h-4" />
                       <span>Assinar</span>
                     </button>
                   ) : signature.status === 'signed' ? (
-                    <span className="inline-flex items-center space-x-1 text-green-600 dark:text-green-400">
+                    <span className="inline-flex items-center gap-1 text-green-600">
                       <CheckCircle2 className="w-5 h-5" />
                       <span className="text-sm font-medium">Assinado</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center space-x-1 text-red-600 dark:text-red-400">
+                    <span className="inline-flex items-center gap-1 text-red-500">
                       <XCircle className="w-5 h-5" />
                       <span className="text-sm font-medium">Rejeitado</span>
                     </span>
@@ -209,17 +212,17 @@ export function DocumentDetails() {
           </div>
         </div>
 
-        <div className="flex items-center space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex flex-wrap gap-3 pt-4 border-t border-[#EAF2FF]">
           <button
             onClick={() => navigate(`/documents/${document.id}/edit`)}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#E0EDFF] text-[#0A192F] hover:bg-[#F5F9FF] transition"
           >
             <Edit className="w-4 h-4" />
             <span>Editar</span>
           </button>
           <button
             onClick={() => setShowDeleteModal(true)}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-red-100 dark:bg-red-900/20 hover:bg-red-200 dark:hover:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#FFE4E4] text-red-600 hover:bg-[#FFD4D4] transition"
           >
             <Trash2 className="w-4 h-4" />
             <span>Excluir</span>
@@ -236,19 +239,19 @@ export function DocumentDetails() {
         title="Confirmar exclusão"
         size="md"
       >
-        <p className="text-gray-600 dark:text-gray-400 mb-6">
+        <p className="text-gray-500 mb-6">
           Tem certeza que deseja excluir este documento? Esta ação não pode ser desfeita.
         </p>
         <div className="flex items-center justify-end space-x-3">
           <button
             onClick={() => setShowDeleteModal(false)}
-            className="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-medium transition-colors"
+            className="px-4 py-2 rounded-full border border-[#E0EDFF] text-[#0A192F] hover:bg-[#F5F9FF] transition"
           >
             Cancelar
           </button>
           <button
             onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+            className="px-4 py-2 rounded-full bg-gradient-to-r from-[#FF6B6B] to-[#EF4444] text-white font-semibold shadow-[0_15px_40px_rgba(239,68,68,0.3)] hover:opacity-90 transition"
           >
             Excluir
           </button>

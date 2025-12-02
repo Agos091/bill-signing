@@ -84,26 +84,30 @@ export function AIAnalysis({ documentId }: AIAnalysisProps) {
   };
 
   const riskLevelConfig = {
-    low: { label: 'Baixo', color: 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20', icon: CheckCircle2 },
-    medium: { label: 'Médio', color: 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20', icon: AlertCircle },
-    high: { label: 'Alto', color: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20', icon: XCircle },
+    low: { label: 'Baixo', color: 'text-[#22C55E] bg-[#E7F9EF]', icon: CheckCircle2 },
+    medium: { label: 'Médio', color: 'text-[#FFB020] bg-[#FFF4E0]', icon: AlertCircle },
+    high: { label: 'Alto', color: 'text-[#EF4444] bg-[#FEECEC]', icon: XCircle },
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-      <div className="flex items-center space-x-2 mb-6">
-        <Sparkles className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Análise Inteligente com IA
-        </h3>
+    <div className="bg-white rounded-[32px] border border-[#E0EDFF] p-8 shadow-[0_25px_70px_rgba(10,132,255,0.08)] space-y-6">
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0A84FF] to-[#4BC0FF] flex items-center justify-center text-white shadow-[0_15px_40px_rgba(10,132,255,0.25)]">
+          <Sparkles className="w-6 h-6" />
+        </span>
+        <div>
+          <p className="text-xs uppercase tracking-[0.4em] text-blue-500">IA aplicada</p>
+          <h3 className="text-2xl font-semibold text-[#0A192F]">
+            Análise inteligente
+          </h3>
+        </div>
       </div>
 
-      {/* Botões de ação */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <button
           onClick={handleAnalyze}
           disabled={isAnalyzing}
-          className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#0A84FF] to-[#4BC0FF] text-white rounded-2xl font-medium shadow-[0_12px_40px_rgba(10,132,255,0.2)] transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isAnalyzing ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -154,7 +158,7 @@ export function AIAnalysis({ documentId }: AIAnalysisProps) {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-2 mb-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex flex-wrap gap-2 mb-4 border-b border-[#EAF2FF]">
         {[
           { id: 'analysis' as const, label: 'Análise', visible: !!analysis },
           { id: 'summary' as const, label: 'Resumo', visible: !!summary },
@@ -177,33 +181,35 @@ export function AIAnalysis({ documentId }: AIAnalysisProps) {
           ))}
       </div>
 
-      {/* Conteúdo das tabs */}
       <div className="min-h-[200px]">
         {activeTab === 'analysis' && analysis && (
-          <div className="space-y-4 animate-fade-in">
+          <div className="space-y-4 animate-fade-in bg-[#F5F9FF] rounded-3xl border border-[#EAF2FF] p-6">
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Resumo</h4>
-              <p className="text-gray-600 dark:text-gray-400">{analysis.summary}</p>
+              <h4 className="font-semibold text-[#0A192F] mb-2">Resumo</h4>
+              <p className="text-gray-600">{analysis.summary}</p>
             </div>
 
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Pontos-Chave</h4>
-              <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
+              <h4 className="font-semibold text-[#0A192F] mb-2">Pontos-Chave</h4>
+              <ul className="space-y-2">
                 {analysis.keyPoints.map((point, idx) => (
-                  <li key={idx}>{point}</li>
+                  <li key={idx} className="flex gap-2 text-gray-600">
+                    <span className="w-1.5 h-1.5 mt-2 rounded-full bg-[#0A84FF]" />
+                    <span>{point}</span>
+                  </li>
                 ))}
               </ul>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-4">
               <div>
-                <span className="text-sm text-gray-500 dark:text-gray-400">Nível de Risco:</span>
+                <span className="text-sm text-gray-500">Nível de risco:</span>
                 {(() => {
                   const config = riskLevelConfig[analysis.riskLevel];
                   const Icon = config.icon;
                   return (
                     <span
-                      className={`ml-2 inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium ${config.color}`}
+                      className={`ml-2 inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-medium ${config.color}`}
                     >
                       <Icon className="w-4 h-4" />
                       <span>{config.label}</span>
@@ -212,8 +218,8 @@ export function AIAnalysis({ documentId }: AIAnalysisProps) {
                 })()}
               </div>
               {analysis.estimatedReadingTime && (
-                <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-                  <Clock className="w-4 h-4" />
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Clock className="w-4 h-4 text-[#0A84FF]" />
                   <span>~{analysis.estimatedReadingTime} min de leitura</span>
                 </div>
               )}
@@ -221,74 +227,81 @@ export function AIAnalysis({ documentId }: AIAnalysisProps) {
 
             {analysis.suggestions.length > 0 && (
               <div>
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center space-x-2">
-                  <Lightbulb className="w-4 h-4" />
+                <h4 className="font-semibold text-[#0A192F] mb-2 flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-[#0A84FF]" />
                   <span>Sugestões</span>
                 </h4>
-                <ul className="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
+                <div className="grid gap-3 md:grid-cols-2">
                   {analysis.suggestions.map((suggestion, idx) => (
-                    <li key={idx}>{suggestion}</li>
+                    <div key={idx} className="p-4 rounded-2xl border border-[#E0EDFF] bg-white">
+                      <p className="text-sm text-gray-600">{suggestion}</p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
           </div>
         )}
 
         {activeTab === 'summary' && summary && (
-          <div className="animate-fade-in">
-            <p className="text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
+          <div className="animate-fade-in bg-[#F5F9FF] rounded-3xl border border-[#EAF2FF] p-6 space-y-3">
+            <h4 className="text-lg font-semibold text-[#0A192F]">Resumo completo</h4>
+            <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
               {summary}
             </p>
           </div>
         )}
 
         {activeTab === 'suggestions' && suggestions && (
-          <div className="space-y-3 animate-fade-in">
-            {suggestions.map((suggestion, idx) => (
-              <div
-                key={idx}
-                className="flex items-start space-x-3 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800"
-              >
-                <Lightbulb className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
-                <p className="text-gray-700 dark:text-gray-300">{suggestion}</p>
-              </div>
-            ))}
+          <div className="space-y-4 animate-fade-in">
+            <h4 className="text-lg font-semibold text-[#0A192F]">Sugestões da IA</h4>
+            <div className="grid gap-3 md:grid-cols-2">
+              {suggestions.map((suggestion, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start gap-3 p-4 bg-[#F3F0FF] rounded-2xl border border-[#E2D9FF]"
+                >
+                  <Lightbulb className="w-5 h-5 text-[#7C3AED] mt-0.5" />
+                  <p className="text-gray-700">{suggestion}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
         {activeTab === 'compliance' && compliance && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="flex items-center space-x-3">
+          <div className="space-y-4 animate-fade-in bg-[#F5F9FF] rounded-3xl border border-[#EAF2FF] p-6">
+            <h4 className="text-lg font-semibold text-[#0A192F]">Conformidade</h4>
+            <div className="flex flex-wrap items-center gap-3">
               {compliance.compliant ? (
-                <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
+                <span className="inline-flex items-center gap-2 text-[#22C55E] font-semibold text-lg">
                   <CheckCircle2 className="w-6 h-6" />
-                  <span className="font-semibold text-lg">Documento em Conformidade</span>
-                </div>
+                  Documento em conformidade
+                </span>
               ) : (
-                <div className="flex items-center space-x-2 text-red-600 dark:text-red-400">
+                <span className="inline-flex items-center gap-2 text-[#EF4444] font-semibold text-lg">
                   <XCircle className="w-6 h-6" />
-                  <span className="font-semibold text-lg">Problemas de Conformidade Encontrados</span>
-                </div>
+                  Problemas encontrados
+                </span>
               )}
             </div>
 
             {compliance.issues.length > 0 && (
-              <div>
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Problemas Identificados:</h4>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+              <div className="space-y-3">
+                <h4 className="font-semibold text-[#0A192F]">Problemas identificados:</h4>
+                <div className="space-y-3">
                   {compliance.issues.map((issue, idx) => (
-                    <li key={idx} className="flex items-start">
-                      <AlertCircle className="w-4 h-4 text-red-500 mr-2 flex-shrink-0 mt-1" />
-                      <span>{issue}</span>
-                    </li>
+                    <div key={idx} className="flex items-start gap-3 p-4 rounded-2xl border border-[#FFE4E4] bg-white">
+                      <AlertCircle className="w-4 h-4 text-[#EF4444] mt-1" />
+                      <span className="text-gray-600">{issue}</span>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
 
             {compliance.compliant && compliance.issues.length === 0 && (
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600">
                 O documento está em conformidade com todas as regras verificadas.
               </p>
             )}

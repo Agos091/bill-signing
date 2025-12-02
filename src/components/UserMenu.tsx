@@ -82,53 +82,58 @@ export function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        className={`flex items-center gap-3 px-4 py-2 rounded-full border transition-all ${
+          isOpen ? 'border-[#0A84FF]/30 bg-white shadow-[0_12px_30px_rgba(10,132,255,0.15)]' : 'border-[#E3EDFF] bg-white/80 hover:border-[#0A84FF]/20'
+        }`}
         aria-label="Menu do usuário"
         aria-expanded={isOpen}
       >
-        <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
-          <span className="text-sm">{currentUser.avatar || '👤'}</span>
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#0A84FF] to-[#4BC0FF] flex items-center justify-center text-white text-sm shadow-[0_8px_20px_rgba(10,132,255,0.4)]">
+          <span>{currentUser.avatar || '👤'}</span>
         </div>
         <div className="hidden sm:block text-left">
-          <p className="text-sm font-medium text-gray-900 dark:text-white">
+          <p className="text-sm font-semibold text-[#0A192F]">
             {currentUser.name}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-gray-500">
             {currentUser.email}
           </p>
         </div>
         <ChevronDown
-          className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform ${
+          className={`w-4 h-4 text-[#0A84FF] transition-transform ${
             isOpen ? 'transform rotate-180' : ''
           }`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 animate-fade-in">
-          {/* Header do menu */}
-          <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+        <div className="absolute right-0 mt-3 w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_25px_60px_rgba(10,132,255,0.15)] border border-[#E3EDFF] py-3 z-50 animate-fade-in">
+          <div className="px-5 pb-3 border-b border-[#EAF2FF]">
+            <p className="text-sm font-semibold text-[#0A192F]">
               {currentUser.name}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+            <p className="text-xs text-gray-500 truncate">
               {currentUser.email}
             </p>
           </div>
 
-          {/* Itens do menu */}
-          <div className="py-1">
+          <div className="py-2">
             {menuItems.map((item, index) => (
               <div key={index}>
                 {item.divider && (
-                  <div className="my-1 border-t border-gray-200 dark:border-gray-700" />
+                  <div className="my-2 border-t border-[#EAF2FF]" />
                 )}
                 <button
                   onClick={item.onClick}
-                  className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="w-full flex items-center justify-between px-5 py-2.5 text-sm text-gray-600 hover:bg-[#F3F8FF] transition-colors"
                 >
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.label}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-2xl bg-[#F3F8FF] text-[#0A84FF]">
+                      <item.icon className="w-4 h-4" />
+                    </span>
+                    <span className="text-gray-700 font-medium">{item.label}</span>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-[0.3em] text-gray-400">→</span>
                 </button>
               </div>
             ))}
