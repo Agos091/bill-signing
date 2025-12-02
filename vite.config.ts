@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -25,12 +26,12 @@ export default defineConfig({
         'dist/',
         'server/',
       ],
-            thresholds: {
-              lines: 5,
-              functions: 15,
-              branches: 20,
-              statements: 5,
-            },
+      thresholds: {
+        lines: 5,
+        functions: 15,
+        branches: 20,
+        statements: 5,
+      },
     },
   },
 })

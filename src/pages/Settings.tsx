@@ -123,7 +123,7 @@ export function Settings() {
             </label>
             <input
               type="text"
-              value={currentUser.name}
+              value={currentUser?.name || ''}
               disabled
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
             />
@@ -134,7 +134,7 @@ export function Settings() {
             </label>
             <input
               type="email"
-              value={currentUser.email}
+              value={currentUser?.email || ''}
               disabled
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
             />
