@@ -42,6 +42,20 @@ export function Documents() {
     return matchesSearch && matchesFilter;
   });
 
+  const stats = [
+    { label: 'Total', value: documents.length },
+    { label: 'Pendentes', value: documents.filter((doc) => doc.status === 'pending').length },
+    { label: 'Assinados', value: documents.filter((doc) => doc.status === 'signed').length },
+  ];
+
+  const filterOptions: Array<{ value: DocumentStatus | 'all'; label: string }> = [
+    { value: 'all', label: 'Todos' },
+    { value: 'pending', label: 'Pendentes' },
+    { value: 'signed', label: 'Assinados' },
+    { value: 'rejected', label: 'Rejeitados' },
+    { value: 'expired', label: 'Expirados' },
+  ];
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -51,82 +65,105 @@ export function Documents() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Documentos
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Gerencie todos os seus documentos e assinaturas
-          </p>
+    <div className="space-y-10 animate-fade-in">
+      <section className="rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white p-8 overflow-hidden relative">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-20 -right-10 w-72 h-72 bg-primary-500/40 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/20 blur-[120px]" />
         </div>
-        <Link
-          to="/create"
-          className="inline-flex items-center space-x-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Novo Documento</span>
-        </Link>
-      </div>
+        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+          <div>
+            <p className="uppercase tracking-[0.5em] text-xs text-white/60">Coleção</p>
+            <h1 className="text-4xl font-semibold mt-3 mb-4">Seus documentos em um só lugar.</h1>
+            <p className="text-white/70 text-lg max-w-2xl">
+              Organize e acompanhe cada etapa das assinaturas com a mesma fluidez e refinamento de um aplicativo da Apple.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link to="/create" className="accent-pill shadow-primary-500/50 hover:translate-y-0.5 transition-transform">
+                <Plus className="w-4 h-4 mr-2" />
+                Novo Documento
+              </Link>
+              <button className="px-5 py-2 rounded-full border border-white/20 text-white/80 hover:bg-white/10 transition">
+                Explorar modelos
+              </button>
+            </div>
+          </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <div className="glass-panel rounded-3xl p-6 grid grid-cols-3 gap-4 min-w-[280px]">
+            {stats.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
+                <p className="text-2xl font-semibold text-slate-900 dark:text-white">{stat.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="glass-panel rounded-3xl p-5 space-y-4">
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
               type="text"
-              placeholder="Buscar documentos..."
+              placeholder="Buscar por título ou descrição..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white/70 dark:bg-white/5 border border-white/60 dark:border-white/10 focus:ring-2 focus:ring-primary-500/60"
             />
           </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as DocumentStatus | 'all')}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="all">Todos os status</option>
-            <option value="pending">Pendente</option>
-            <option value="signed">Assinado</option>
-            <option value="rejected">Rejeitado</option>
-            <option value="expired">Expirado</option>
-          </select>
         </div>
-      </div>
+        <div className="flex flex-wrap gap-2">
+          {filterOptions.map((option) => {
+            const isActive = filterStatus === option.value;
+            return (
+              <button
+                key={option.value}
+                onClick={() => setFilterStatus(option.value)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  isActive
+                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-lg'
+                    : 'bg-white/70 dark:bg-white/5 text-slate-500 hover:bg-white'
+                }`}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       ) : filteredDocuments.length > 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+        <div className="glass-panel rounded-3xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+              <thead className="bg-white/70 dark:bg-white/5 border-b border-white/60 dark:border-white/5">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Documento
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Assinaturas
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Criado em
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Expira em
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Ações
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="divide-y divide-white/70 dark:divide-white/5">
                 {filteredDocuments.map((doc) => {
                   const StatusIcon = statusConfig[doc.status].icon;
                   const statusStyle = statusConfig[doc.status];
@@ -134,10 +171,7 @@ export function Documents() {
                   const totalSignatures = doc.signatures.length;
 
                   return (
-                    <tr
-                      key={doc.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                    >
+                    <tr key={doc.id} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4">
                         <div className="max-w-md">
                           <Link
@@ -210,8 +244,8 @@ export function Documents() {
           </div>
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
+        <div className="glass-panel rounded-3xl p-12 text-center space-y-4">
+          <p className="text-slate-600 dark:text-slate-300">
             {searchTerm || filterStatus !== 'all'
               ? 'Nenhum documento encontrado com os filtros aplicados'
               : 'Nenhum documento ainda'}
@@ -219,7 +253,7 @@ export function Documents() {
           {(!searchTerm && filterStatus === 'all') && (
             <Link
               to="/create"
-              className="inline-flex items-center space-x-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+              className="accent-pill inline-flex items-center space-x-2"
             >
               <Plus className="w-5 h-5" />
               <span>Criar primeiro documento</span>
