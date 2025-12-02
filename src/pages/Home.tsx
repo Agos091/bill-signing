@@ -17,7 +17,7 @@ export function Home() {
 
   return (
     <div className="space-y-10 animate-fade-in">
-      <section className="rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-8 text-white overflow-hidden relative">
+      <section className="rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-6 sm:p-8 text-white overflow-hidden relative">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -right-20 top-0 w-72 h-72 bg-primary-500/40 blur-[120px]" />
           <div className="absolute left-10 bottom-0 w-60 h-60 bg-indigo-400/20 blur-[160px]" />
@@ -41,7 +41,7 @@ export function Home() {
               </Link>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 glass-panel rounded-3xl p-6 min-w-[260px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 glass-panel rounded-3xl p-6 w-full lg:max-w-sm">
             {[
               { icon: FileText, label: 'Total', value: stats.total },
               { icon: Clock, label: 'Pendentes', value: stats.pending },

@@ -66,7 +66,7 @@ export function Documents() {
 
   return (
     <div className="space-y-10 animate-fade-in">
-      <section className="rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white p-8 overflow-hidden relative">
+      <section className="rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white p-6 sm:p-8 overflow-hidden relative">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-20 -right-10 w-72 h-72 bg-primary-500/40 blur-3xl" />
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/20 blur-[120px]" />
@@ -89,7 +89,7 @@ export function Documents() {
             </div>
           </div>
 
-          <div className="glass-panel rounded-3xl p-6 grid grid-cols-3 gap-4 min-w-[280px]">
+          <div className="glass-panel rounded-3xl p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
                 <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
@@ -101,7 +101,7 @@ export function Documents() {
       </section>
 
       <section className="glass-panel rounded-3xl p-5 space-y-4">
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col lg:flex-row gap-4 w-full">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
