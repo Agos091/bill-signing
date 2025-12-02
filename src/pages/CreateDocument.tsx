@@ -162,12 +162,10 @@ export function CreateDocument() {
           />
           {expiresAt && (
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {new Date(expiresAt).toLocaleString('pt-BR', {
+              {new Date(expiresAt).toLocaleDateString('pt-BR', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
               })}
             </p>
           )}
