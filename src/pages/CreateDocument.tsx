@@ -86,19 +86,20 @@ export function CreateDocument() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Novo Documento
+    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+      <div className="bg-gradient-to-br from-[#F5F9FF] via-white to-white rounded-[32px] border border-[#E0EDFF] p-8 shadow-[0_25px_70px_rgba(10,132,255,0.08)] space-y-4">
+        <span className="uppercase text-xs tracking-[0.4em] text-blue-500">Documentos</span>
+        <h1 className="text-4xl font-semibold text-[#0A192F]">
+          Criar documento com IA e fluxo organizado
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Crie um novo documento e adicione os signatários
+        <p className="text-gray-600">
+          Defina título, descreva o escopo, adicione signatários e use IA para enriquecer o conteúdo.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white rounded-[32px] border border-[#E0EDFF] p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)] space-y-6">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="title" className="block text-sm font-medium text-[#0A192F] mb-2">
             Título {!uploadedFile && '*'}
           </label>
           <input
@@ -106,14 +107,14 @@ export function CreateDocument() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-[#E0EDFF] rounded-2xl bg-white text-gray-900 focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF]"
             placeholder="Ex: Contrato de Prestação de Serviços"
             required={!uploadedFile}
           />
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="description" className="block text-sm font-medium text-[#0A192F] mb-2">
             Descrição {!uploadedFile && '*'}
           </label>
           <textarea
@@ -121,14 +122,14 @@ export function CreateDocument() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+            className="w-full px-4 py-3 border border-[#E0EDFF] rounded-2xl bg-white text-gray-900 focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF] resize-none"
             placeholder={uploadedFile ? "Descreva o conteúdo do documento (opcional se arquivo foi enviado)..." : "Descreva o conteúdo do documento..."}
             required={!uploadedFile}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-[#0A192F] mb-2">
             Anexar Arquivo (opcional)
           </label>
           <FileUpload
@@ -144,13 +145,13 @@ export function CreateDocument() {
             }}
             onFileRemoved={() => setUploadedFile(null)}
           />
-          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-xs text-gray-500">
             Formatos suportados: PDF, CSV, TXT, MD, DOC, DOCX, XLS, XLSX (máx. 10MB)
           </p>
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="expiresAt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="expiresAt" className="block text-sm font-medium text-[#0A192F] mb-2">
             Data de Expiração (opcional)
           </label>
           <input
@@ -158,10 +159,10 @@ export function CreateDocument() {
             type="date"
             value={expiresAt}
             onChange={(e) => setExpiresAt(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-[#E0EDFF] rounded-2xl bg-white text-gray-900 focus:ring-2 focus:ring-[#0A84FF]/20 focus:border-[#0A84FF]"
           />
           {expiresAt && (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500">
               {new Date(expiresAt).toLocaleDateString('pt-BR', {
                 day: '2-digit',
                 month: '2-digit',
@@ -173,11 +174,11 @@ export function CreateDocument() {
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium text-[#0A192F]">
               Signatários *
             </label>
             {signaturesError && (
-              <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+              <span className="text-xs text-red-600 font-medium">
                 Adicione pelo menos um signatário
               </span>
             )}
@@ -187,16 +188,16 @@ export function CreateDocument() {
             {signatures.map((sig) => (
               <div
                 key={sig.userEmail}
-                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                className="flex items-center justify-between p-4 bg-[#F5F9FF] rounded-2xl border border-[#EAF2FF]"
               >
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{sig.userName}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{sig.userEmail}</p>
+                  <p className="font-medium text-[#0A192F]">{sig.userName}</p>
+                  <p className="text-sm text-gray-500">{sig.userEmail}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleRemoveSignature(sig.userEmail)}
-                  className="p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                  className="p-1 text-red-500 hover:bg-[#FFE4E4] rounded-full"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -229,18 +230,18 @@ export function CreateDocument() {
           </div>
         </div>
 
-        <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-[#EAF2FF]">
           <button
             type="button"
             onClick={() => navigate('/documents')}
-            className="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-medium transition-colors"
+            className="px-5 py-2 rounded-full border border-[#E0EDFF] text-[#0A192F] hover:bg-[#F5F9FF] transition"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 rounded-full bg-gradient-to-r from-[#0A84FF] to-[#4BC0FF] text-white font-semibold shadow-[0_15px_40px_rgba(10,132,255,0.25)] hover:shadow-[0_15px_45px_rgba(10,132,255,0.35)] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Criando...' : 'Criar Documento'}
           </button>
