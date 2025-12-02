@@ -13,9 +13,15 @@ export async function getAllUsers(): Promise<User[]> {
 
   if (error) {
     console.error('Erro ao buscar usuários:', error);
-    throw new Error('Erro ao buscar usuários');
+    // Se a tabela não existe (PGRST116 ou 404), retorna array vazio
+    if (error.code === 'PGRST116' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
+      console.warn('Tabela profiles não encontrada. Execute o SQL do schema no Supabase.');
+      return [];
+    }
+    throw new Error(`Erro ao buscar usuários: ${error.message}`);
   }
 
+  if (!data) return [];
   return data.map(mapProfileToUser);
 }
 
@@ -67,9 +73,15 @@ export async function getAllDocuments(): Promise<Document[]> {
 
   if (error) {
     console.error('Erro ao buscar documentos:', error);
-    throw new Error('Erro ao buscar documentos');
+    // Se a tabela não existe, retorna array vazio
+    if (error.code === 'PGRST116' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
+      console.warn('Tabela documents não encontrada. Execute o SQL do schema no Supabase.');
+      return [];
+    }
+    throw new Error(`Erro ao buscar documentos: ${error.message}`);
   }
 
+  if (!data) return [];
   return data.map(mapDocumentFromDB);
 }
 
