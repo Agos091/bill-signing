@@ -1,4 +1,24 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const HOST_MAP: Record<string, string> = {
+  'bill-signing-ogl4.vercel.app': 'https://bill-signing-production.up.railway.app/api',
+};
+
+function resolveApiBaseUrl(): string {
+  const envValue = import.meta.env.VITE_API_BASE_URL?.trim();
+  if (envValue) {
+    return envValue.replace(/\/$/, '');
+  }
+
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (HOST_MAP[hostname]) {
+      return HOST_MAP[hostname];
+    }
+  }
+
+  return 'http://localhost:3001/api';
+}
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 // Função para obter o token do localStorage
 function getAuthToken(): string | null {

@@ -13,12 +13,28 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
+const allowedOrigins = CORS_ORIGIN.split(',')
+  .map((origin) => origin.trim().replace(/^['"]|['"]$/g, ''))
+  .filter(Boolean);
 
 // Middleware
-app.use(cors({ 
-  origin: CORS_ORIGIN.split(',').map(o => o.trim()),
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.warn(`CORS bloqueado para origem não permitida: ${origin}`);
+      return callback(new Error('Origin not allowed by CORS'));
+    },
+    credentials: true,
+  })
+);
 
 // JSON parser
 app.use(express.json({ 
