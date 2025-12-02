@@ -65,6 +65,9 @@ export function FileUpload({
         headers['Authorization'] = `Bearer ${token}`;
       }
 
+      // Log para debug (remover em produção se necessário)
+      console.log('Upload URL:', `${API_BASE_URL}/upload`);
+
       const response = await fetch(`${API_BASE_URL}/upload`, {
         method: 'POST',
         headers,

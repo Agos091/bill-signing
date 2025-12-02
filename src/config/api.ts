@@ -3,18 +3,26 @@ const HOST_MAP: Record<string, string> = {
 };
 
 function resolveApiBaseUrl(): string {
+  // Prioridade 1: Variável de ambiente explícita
   const envValue = import.meta.env.VITE_API_BASE_URL?.trim();
   if (envValue) {
     return envValue.replace(/\/$/, '');
   }
 
+  // Prioridade 2: Mapeamento por hostname (produção)
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     if (HOST_MAP[hostname]) {
       return HOST_MAP[hostname];
     }
+    
+    // Se estiver no Vercel (qualquer subdomínio), usa Railway
+    if (hostname.includes('vercel.app')) {
+      return 'https://bill-signing-production.up.railway.app/api';
+    }
   }
 
+  // Fallback: desenvolvimento local
   return 'http://localhost:3001/api';
 }
 
