@@ -170,12 +170,13 @@ jobs:
           echo "paths=$COVERAGE_PATHS" >> $GITHUB_OUTPUT
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@ba3875ecf642b2129de2b589510c81a8b53dbf4e
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.javascript.lcov.reportPaths=${{ steps.coverage.outputs.paths }}
+            ${{ steps.coverage.outputs.paths && format('-Dsonar.javascript.lcov.reportPaths={0}', steps.coverage.outputs.paths) }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
 
