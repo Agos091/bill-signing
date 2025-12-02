@@ -61,15 +61,21 @@ export async function getUserByEmail(email: string): Promise<User | null> {
 // DOCUMENTS
 // ============================================
 
-export async function getAllDocuments(): Promise<Document[]> {
-  const { data, error } = await supabaseAdmin
+export async function getAllDocuments(userId?: string): Promise<Document[]> {
+  let query = supabaseAdmin
     .from('documents')
     .select(`
       *,
       created_by_profile:profiles!documents_created_by_fkey(*),
       signatures(*)
-    `)
-    .order('created_at', { ascending: false });
+    `);
+
+  // Se userId for fornecido, filtra apenas documentos desse usuário
+  if (userId) {
+    query = query.eq('created_by', userId);
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false });
 
   if (error) {
     console.error('Erro ao buscar documentos:', error);

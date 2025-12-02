@@ -13,11 +13,14 @@ function getLLMProvider() {
 // Todas as rotas requerem autenticação
 router.use(authMiddleware);
 
-// GET /api/documents - Lista todos os documentos
+// GET /api/documents - Lista documentos do usuário logado
 router.get('/', async (req: Request, res: Response) => {
   try {
     const { status } = req.query;
-    let documents = await db.getAllDocuments();
+    const userId = req.user!.id;
+    
+    // Busca apenas documentos criados pelo usuário logado
+    let documents = await db.getAllDocuments(userId);
 
     if (status && typeof status === 'string') {
       documents = documents.filter((doc) => doc.status === status);
@@ -34,10 +37,16 @@ router.get('/', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = req.user!.id;
     const document = await db.getDocumentById(id);
 
     if (!document) {
       return res.status(404).json({ error: 'Documento não encontrado' });
+    }
+
+    // Verifica se o documento pertence ao usuário logado
+    if (document.createdBy.id !== userId) {
+      return res.status(403).json({ error: 'Acesso negado: este documento não pertence a você' });
     }
 
     res.json(document);
@@ -91,7 +100,18 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = req.user!.id;
     const updates = req.body;
+
+    // Verifica se o documento existe e pertence ao usuário
+    const document = await db.getDocumentById(id);
+    if (!document) {
+      return res.status(404).json({ error: 'Documento não encontrado' });
+    }
+
+    if (document.createdBy.id !== userId) {
+      return res.status(403).json({ error: 'Acesso negado: este documento não pertence a você' });
+    }
 
     const updated = await db.updateDocument(id, updates);
     if (!updated) {
@@ -109,8 +129,19 @@ router.put('/:id', async (req: Request, res: Response) => {
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const deleted = await db.deleteDocument(id);
+    const userId = req.user!.id;
 
+    // Verifica se o documento existe e pertence ao usuário
+    const document = await db.getDocumentById(id);
+    if (!document) {
+      return res.status(404).json({ error: 'Documento não encontrado' });
+    }
+
+    if (document.createdBy.id !== userId) {
+      return res.status(403).json({ error: 'Acesso negado: este documento não pertence a você' });
+    }
+
+    const deleted = await db.deleteDocument(id);
     if (!deleted) {
       return res.status(404).json({ error: 'Documento não encontrado' });
     }
@@ -127,18 +158,36 @@ router.post('/:id/sign', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { signatureId, comment } = req.body;
+    const userEmail = req.user!.email;
 
     if (!signatureId) {
       return res.status(400).json({ error: 'signatureId é obrigatório' });
     }
 
-    const document = await db.signDocument(id, signatureId, comment);
-    
+    // Verifica se o documento existe
+    const document = await db.getDocumentById(id);
     if (!document) {
       return res.status(404).json({ error: 'Documento não encontrado' });
     }
 
-    res.json(document);
+    // Verifica se o usuário está na lista de signatários
+    const signature = document.signatures.find((sig) => sig.id === signatureId);
+    if (!signature) {
+      return res.status(404).json({ error: 'Assinatura não encontrada' });
+    }
+
+    // Verifica se o email do usuário corresponde ao signatário
+    if (signature.userEmail !== userEmail) {
+      return res.status(403).json({ error: 'Acesso negado: você não está autorizado a assinar este documento' });
+    }
+
+    const signedDocument = await db.signDocument(id, signatureId, comment);
+    
+    if (!signedDocument) {
+      return res.status(404).json({ error: 'Documento não encontrado' });
+    }
+
+    res.json(signedDocument);
   } catch (error) {
     console.error('Erro ao assinar documento:', error);
     res.status(500).json({ error: 'Erro ao assinar documento' });
@@ -183,10 +232,16 @@ router.post('/:id/analyze', async (req: Request, res: Response) => {
 router.post('/:id/summary', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = req.user!.id;
     const document = await db.getDocumentById(id);
 
     if (!document) {
       return res.status(404).json({ error: 'Documento não encontrado' });
+    }
+
+    // Verifica se o documento pertence ao usuário logado
+    if (document.createdBy.id !== userId) {
+      return res.status(403).json({ error: 'Acesso negado: este documento não pertence a você' });
     }
 
     const content = `${document.title}\n\n${document.description}`;
@@ -203,10 +258,16 @@ router.post('/:id/summary', async (req: Request, res: Response) => {
 router.post('/:id/suggestions', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = req.user!.id;
     const document = await db.getDocumentById(id);
 
     if (!document) {
       return res.status(404).json({ error: 'Documento não encontrado' });
+    }
+
+    // Verifica se o documento pertence ao usuário logado
+    if (document.createdBy.id !== userId) {
+      return res.status(403).json({ error: 'Acesso negado: este documento não pertence a você' });
     }
 
     const content = `${document.title}\n\n${document.description}`;
@@ -223,11 +284,17 @@ router.post('/:id/suggestions', async (req: Request, res: Response) => {
 router.post('/:id/compliance', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = req.user!.id;
     const { rules } = req.body;
     const document = await db.getDocumentById(id);
 
     if (!document) {
       return res.status(404).json({ error: 'Documento não encontrado' });
+    }
+
+    // Verifica se o documento pertence ao usuário logado
+    if (document.createdBy.id !== userId) {
+      return res.status(403).json({ error: 'Acesso negado: este documento não pertence a você' });
     }
 
     const content = `${document.title}\n\n${document.description}`;
