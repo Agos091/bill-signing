@@ -84,6 +84,11 @@ CREATE POLICY "Profiles são visíveis para todos os usuários autenticados"
   TO authenticated
   USING (true);
 
+CREATE POLICY "Usuários podem criar seu próprio profile"
+  ON public.profiles FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = id);
+
 CREATE POLICY "Usuários podem atualizar seu próprio profile"
   ON public.profiles FOR UPDATE
   TO authenticated
