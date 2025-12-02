@@ -149,7 +149,7 @@ export function CreateDocument() {
           </p>
         </div>
 
-        <div>
+        <div className="space-y-2">
           <label htmlFor="expiresAt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Data de Expiração (opcional)
           </label>
@@ -160,6 +160,17 @@ export function CreateDocument() {
             onChange={(e) => setExpiresAt(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
+          {expiresAt && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {new Date(expiresAt).toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </p>
+          )}
         </div>
 
         <div>
