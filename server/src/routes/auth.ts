@@ -34,6 +34,20 @@ router.post('/signup', async (req: Request, res: Response) => {
       return res.status(400).json({ error: error.message });
     }
 
+    // Cria o profile automaticamente após criar o usuário
+    if (data.user) {
+      await supabaseAdmin
+        .from('profiles')
+        .upsert({
+          id: data.user.id,
+          name: name || email.split('@')[0],
+          email: email,
+          avatar: '👤',
+        }, {
+          onConflict: 'id',
+        });
+    }
+
     // Gera token de acesso
     const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'magiclink',
@@ -92,18 +106,39 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(401).json({ error: error.message });
     }
 
-    // Busca dados do profile
-    const { data: profile } = await supabaseAdmin
+    // Busca ou cria dados do profile
+    let profile = null;
+    const { data: profileData, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('*')
       .eq('id', data.user.id)
-      .single();
+      .maybeSingle();
+
+    // Se profile não existe, cria automaticamente
+    if (!profileData && data.user) {
+      const { data: newProfile, error: createError } = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'Usuário',
+          email: data.user.email || '',
+          avatar: data.user.user_metadata?.avatar || '👤',
+        })
+        .select()
+        .single();
+
+      if (!createError && newProfile) {
+        profile = newProfile;
+      }
+    } else {
+      profile = profileData;
+    }
 
     res.json({
       user: {
         id: data.user.id,
         email: data.user.email,
-        name: profile?.name || data.user.email?.split('@')[0],
+        name: profile?.name || data.user.user_metadata?.name || data.user.email?.split('@')[0],
         avatar: profile?.avatar || '👤',
       },
       session: {
@@ -152,17 +187,38 @@ router.get('/me', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Token inválido' });
     }
 
-    // Busca dados do profile
-    const { data: profile } = await supabaseAdmin
+    // Busca ou cria dados do profile
+    let profile = null;
+    const { data: profileData, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
+
+    // Se profile não existe, cria automaticamente
+    if (!profileData && user) {
+      const { data: newProfile, error: createError } = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          id: user.id,
+          name: user.user_metadata?.name || user.email?.split('@')[0] || 'Usuário',
+          email: user.email || '',
+          avatar: user.user_metadata?.avatar || '👤',
+        })
+        .select()
+        .single();
+
+      if (!createError && newProfile) {
+        profile = newProfile;
+      }
+    } else {
+      profile = profileData;
+    }
 
     res.json({
       id: user.id,
       email: user.email,
-      name: profile?.name || user.email?.split('@')[0],
+      name: profile?.name || user.user_metadata?.name || user.email?.split('@')[0],
       avatar: profile?.avatar || '👤',
     });
   } catch (error) {

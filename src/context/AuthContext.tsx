@@ -70,15 +70,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Erro ao fazer login');
       }
 
-      // Busca dados do profile (ignora erro se tabela não existir)
-      const { data: profile, error: profileError } = await supabase
+      // Busca dados do profile (cria se não existir)
+      let profile = null;
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', data.user.id)
-        .single();
+        .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') {
-        console.warn('Erro ao buscar profile (tabela pode não existir):', profileError);
+        console.warn('Erro ao buscar profile:', profileError);
+      }
+
+      // Se profile não existe, cria automaticamente
+      if (!profileData && data.user) {
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'Usuário',
+            email: data.user.email || '',
+            avatar: data.user.user_metadata?.avatar || '👤',
+          })
+          .select()
+          .single();
+
+        if (!createError && newProfile) {
+          profile = newProfile;
+        }
+      } else {
+        profile = profileData;
       }
 
       const userData: User = {
