@@ -14,7 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
 const allowedOrigins = CORS_ORIGIN.split(',')
-  .map((origin) => origin.trim().replace(/^['"]|['"]$/g, ''))
+  .map((origin) => origin.trim().replace(/(^['"])|(['"]$)/g, ''))
   .filter(Boolean);
 
 // Middleware
