@@ -12,11 +12,6 @@ export function UserMenu() {
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Se não há usuário logado, não renderiza o menu
-  if (!currentUser) {
-    return null;
-  }
-
   // Fecha o menu ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -33,6 +28,11 @@ export function UserMenu() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
+
+  // Se não há usuário logado, não renderiza o menu
+  if (!currentUser) {
+    return null;
+  }
 
   const handleLogout = async () => {
     try {
