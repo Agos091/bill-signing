@@ -95,10 +95,10 @@ CREATE POLICY "Usuários podem atualizar seu próprio profile"
   USING (auth.uid() = id);
 
 -- Políticas para documents
-CREATE POLICY "Documentos são visíveis para usuários autenticados"
+CREATE POLICY "Usuários podem ver apenas seus próprios documentos"
   ON public.documents FOR SELECT
   TO authenticated
-  USING (true);
+  USING (auth.uid() = created_by);
 
 CREATE POLICY "Usuários podem criar documentos"
   ON public.documents FOR INSERT
