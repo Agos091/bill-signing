@@ -37,7 +37,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return false;
   });
   
-  const api = useApi();
+  const {
+    isLoading: apiLoading,
+    fetchDocuments,
+    fetchUsers,
+    createDocument: apiCreateDocument,
+    updateDocument: apiUpdateDocument,
+    deleteDocument: apiDeleteDocument,
+    signDocument: apiSignDocument,
+  } = useApi();
 
   // Carrega dados iniciais do backend
   const loadInitialData = useCallback(async () => {
@@ -48,8 +56,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     try {
       const [docsData, usersData] = await Promise.all([
-        api.fetchDocuments(),
-        api.fetchUsers(),
+        fetchDocuments(),
+        fetchUsers(),
       ]);
       
       setDocuments(docsData);
@@ -59,16 +67,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       console.error('Erro ao carregar dados iniciais:', error);
       setIsInitialized(true);
     }
-  }, [api, authUser]);
+  }, [authUser, fetchDocuments, fetchUsers]);
 
   const refreshDocuments = useCallback(async () => {
     try {
-      const docs = await api.fetchDocuments();
+      const docs = await fetchDocuments();
       setDocuments(docs);
     } catch (error) {
       console.error('Erro ao atualizar documentos:', error);
     }
-  }, [api]);
+  }, [fetchDocuments]);
 
   // Inicialização
   useEffect(() => {
@@ -87,19 +95,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [isDarkMode]);
 
   const handleCreateDocument = async (data: CreateDocumentData) => {
-    const doc = await api.createDocument(data);
+    const doc = await apiCreateDocument(data);
     await refreshDocuments();
     return doc;
   };
 
   const handleUpdateDocument = async (id: string, updates: Partial<Document>) => {
-    const doc = await api.updateDocument(id, updates);
+    const doc = await apiUpdateDocument(id, updates);
     await refreshDocuments();
     return doc;
   };
 
   const handleDeleteDocument = async (id: string) => {
-    await api.deleteDocument(id);
+    await apiDeleteDocument(id);
     await refreshDocuments();
   };
 
@@ -108,7 +116,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     signatureId: string,
     comment?: string
   ) => {
-    const doc = await api.signDocument(documentId, signatureId, comment);
+    const doc = await apiSignDocument(documentId, signatureId, comment);
     await refreshDocuments();
     return doc;
   };
@@ -135,7 +143,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         documents,
         currentUser: authUser,
         users,
-        isLoading: api.isLoading,
+        isLoading: apiLoading,
         isDarkMode,
         toggleDarkMode,
         refreshDocuments,
