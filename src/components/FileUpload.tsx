@@ -126,8 +126,8 @@ export function FileUpload({
 
   const handleRemove = () => {
     if (uploadedFile) {
-      // Opcional: deletar arquivo do servidor
-      apiClient.delete(`/upload/${uploadedFile.id}`).catch(console.error);
+      // Opcional: deletar arquivo do servidor (implementar se necessário)
+      // Por enquanto, apenas remove do estado local
     }
     setUploadedFile(null);
     if (onFileRemoved) {
