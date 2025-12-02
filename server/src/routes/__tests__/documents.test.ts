@@ -1,6 +1,30 @@
 import request from 'supertest';
 import express from 'express';
 import documentsRouter from '../documents';
+import { supabaseAdmin } from '../../config/supabase';
+
+// Mock do supabaseAdmin
+jest.mock('../../config/supabase', () => ({
+  supabaseAdmin: {
+    auth: {
+      getUser: jest.fn(),
+    },
+    from: jest.fn(),
+  },
+}));
+
+// Mock do authMiddleware
+jest.mock('../../middleware/auth', () => ({
+  authMiddleware: (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    req.user = {
+      id: 'test-user-id',
+      email: 'test@example.com',
+      name: 'Test User',
+      avatar: '👤',
+    };
+    next();
+  },
+}));
 
 const app = express();
 app.use(express.json());
