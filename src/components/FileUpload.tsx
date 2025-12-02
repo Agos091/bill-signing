@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Upload, File, X, Loader2, FileText, FileSpreadsheet } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { apiClient } from '../config/api';
+import { API_BASE_URL } from '../config/api';
 
 export interface UploadedFile {
   id: string;
@@ -48,14 +48,38 @@ export function FileUpload({
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'}/upload`, {
+      // Obtém o token de autenticação
+      const stored = localStorage.getItem('bill-signing-auth');
+      let token: string | null = null;
+      if (stored) {
+        try {
+          const { session } = JSON.parse(stored);
+          token = session?.access_token || null;
+        } catch {
+          // Ignora erro de parse
+        }
+      }
+
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/upload`, {
         method: 'POST',
+        headers,
         body: formData,
       });
 
+      if (response.status === 401) {
+        localStorage.removeItem('bill-signing-auth');
+        window.location.href = '/login';
+        throw new Error('Sessão expirada');
+      }
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Erro ao fazer upload');
+        const error = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
+        throw new Error(error.error || `Erro ao fazer upload: ${response.status}`);
       }
 
       const uploaded: UploadedFile = await response.json();
