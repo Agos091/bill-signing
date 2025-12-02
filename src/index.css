@@ -36,29 +36,7 @@
 
 @layer base {
   body {
-    font-family: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-    background: radial-gradient(circle at top, #f5f7ff 0%, #edf3ff 30%, #f8fbff 60%, #ffffff 100%);
-    color: #0f172a;
-    min-height: 100vh;
-    @apply dark:bg-gradient-to-b dark:from-gray-900 dark:via-[#0b1120] dark:to-black dark:text-gray-100 antialiased transition-colors;
-  }
-
-  .dark body {
-    background: radial-gradient(circle at top, #0f172a 0%, #0b1120 40%, #05070f 100%);
-  }
-}
-
-@layer components {
-  .glass-panel {
-    @apply backdrop-blur-2xl border border-white/60 dark:border-white/10 bg-white/70 dark:bg-white/5 shadow-[0_15px_40px_rgba(15,23,42,0.08)];
-  }
-
-  .apple-card {
-    @apply rounded-2xl backdrop-blur-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-white/5 shadow-[0_15px_40px_rgba(15,23,42,0.08)] transition-transform duration-300 hover:-translate-y-1;
-  }
-
-  .accent-pill {
-    @apply inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/40;
+    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors;
   }
 }
 

@@ -16,54 +16,79 @@ export function Home() {
   const recentDocuments = documents.slice(0, 4);
 
   return (
-    <div className="space-y-10 animate-fade-in">
-      <section className="rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-6 sm:p-8 text-white overflow-hidden relative">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -right-20 top-0 w-72 h-72 bg-primary-500/40 blur-[120px]" />
-          <div className="absolute left-10 bottom-0 w-60 h-60 bg-indigo-400/20 blur-[160px]" />
-        </div>
-        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
-          <div>
-            <p className="uppercase tracking-[0.4em] text-xs text-white/60">Bem-vindo de volta</p>
-            <h1 className="text-4xl font-semibold mt-3">Gerencie assinaturas com elegância.</h1>
-            <p className="text-white/70 mt-4 max-w-2xl">
-              Acompanhe cada documento com uma experiência visual refinada inspirada no ecossistema Apple.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link to="/create" className="accent-pill shadow-primary-500/50">
-                Criar documento
-              </Link>
-              <Link
-                to="/documents"
-                className="px-5 py-2 rounded-full border border-white/30 text-white/80 hover:bg-white/10 transition"
-              >
-                Ver todos os documentos
-              </Link>
+    <div className="space-y-8 animate-fade-in">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          Dashboard
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Visão geral dos seus documentos e assinaturas
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                {stats.total}
+              </p>
+            </div>
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+              <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 glass-panel rounded-3xl p-6 w-full lg:max-w-sm">
-            {[
-              { icon: FileText, label: 'Total', value: stats.total },
-              { icon: Clock, label: 'Pendentes', value: stats.pending },
-              { icon: CheckCircle2, label: 'Assinados', value: stats.signed },
-              { icon: XCircle, label: 'Rejeitados', value: stats.rejected },
-            ].map((item) => (
-              <div key={item.label} className="rounded-2xl bg-white/70 dark:bg-white/5 p-4 text-slate-900 dark:text-white">
-                <item.icon className="w-5 h-5 mb-3 text-slate-500 dark:text-white/70" />
-                <p className="text-sm text-slate-500 dark:text-white/60">{item.label}</p>
-                <p className="text-2xl font-semibold">{item.value}</p>
-              </div>
-            ))}
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Pendentes</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                {stats.pending}
+              </p>
+            </div>
+            <div className="p-3 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
+              <Clock className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+            </div>
           </div>
         </div>
-      </section>
 
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">Documentos recentes</h2>
-            <p className="text-slate-500 dark:text-slate-400">Continue de onde parou</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Assinados</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                {stats.signed}
+              </p>
+            </div>
+            <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
+              <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
+            </div>
           </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Rejeitados</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                {stats.rejected}
+              </p>
+            </div>
+            <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-lg">
+              <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            Documentos Recentes
+          </h2>
           <Link
             to="/documents"
             className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm"
@@ -79,15 +104,20 @@ export function Home() {
             ))}
           </div>
         ) : (
-          <div className="glass-panel rounded-3xl p-12 text-center space-y-4">
-            <FileText className="w-16 h-16 text-slate-300 mx-auto" />
-            <p className="text-slate-500">Nenhum documento ainda</p>
-            <Link to="/create" className="accent-pill justify-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <FileText className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Nenhum documento ainda
+            </p>
+            <Link
+              to="/create"
+              className="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+            >
               Criar primeiro documento
             </Link>
           </div>
         )}
-      </section>
+      </div>
     </div>
   );
 }

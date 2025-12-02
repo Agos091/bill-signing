@@ -13,8 +13,8 @@ export function Sidebar() {
   const location = useLocation();
 
   return (
-    <aside className="hidden lg:block w-64">
-      <div className="glass-panel rounded-3xl p-6 sticky top-10 space-y-2">
+    <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 min-h-screen">
+      <nav className="p-4 space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -23,29 +23,18 @@ export function Sidebar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center justify-between px-4 py-3 rounded-2xl transition-all ${
+              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
                 isActive
-                  ? 'bg-gradient-to-r from-primary-500/90 to-primary-600/90 text-white shadow-lg shadow-primary-500/30'
-                  : 'text-slate-600 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-white/5'
+                  ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-medium'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
-              <div className="flex items-center space-x-3">
-                <span
-                  className={`w-9 h-9 rounded-2xl flex items-center justify-center ${
-                    isActive
-                      ? 'bg-white/30 text-white'
-                      : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-200'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                </span>
-                <span className="font-medium">{item.label}</span>
-              </div>
-              {isActive && <span className="w-2 h-2 rounded-full bg-white" />}
+              <Icon className="w-5 h-5" />
+              <span>{item.label}</span>
             </Link>
           );
         })}
-      </div>
+      </nav>
     </aside>
   );
 }

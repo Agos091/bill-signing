@@ -45,53 +45,48 @@ export function DocumentCard({ document }: DocumentCardProps) {
   };
 
   return (
-    <Link to={`/documents/${document.id}`} className="apple-card block space-y-6">
-      <div className="flex items-start justify-between">
+    <Link
+      to={`/documents/${document.id}`}
+      className="block bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all duration-200 hover:scale-[1.02] animate-fade-in"
+    >
+      <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
-          <p className="text-xs uppercase tracking-[0.4em] text-slate-400 mb-2">Documento</p>
-          <h3 className="text-xl font-semibold text-slate-900 dark:text-white truncate">{document.title}</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">{document.description}</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate mb-1">
+            {document.title}
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+            {document.description}
+          </p>
         </div>
-        <span
-          className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium border ${statusStyle.color}`}
-        >
-          <StatusIcon className="w-3.5 h-3.5" />
-          <span>{statusStyle.label}</span>
-        </span>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <p className="text-xs text-slate-400 uppercase tracking-[0.2em]">Assinaturas</p>
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-300">
-              <User className="w-4 h-4" />
-              <span className="font-medium">
-                {signedCount}/{totalSignatures}
-              </span>
-            </div>
-            {totalSignatures > 0 && (
-              <div className="w-28 bg-white/60 dark:bg-white/10 rounded-full h-1.5">
-                <div
-                  className="bg-gradient-to-r from-primary-500 to-primary-600 h-1.5 rounded-full transition-all"
-                  style={{ width: `${(signedCount / totalSignatures) * 100}%` }}
-                />
-              </div>
-            )}
-          </div>
+      <div className="flex items-center justify-between mb-4">
+        <span
+          className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusStyle.color}`}
+        >
+          <StatusIcon className="w-4 h-4" />
+          <span>{statusStyle.label}</span>
+        </span>
+
+        <div className="flex items-center space-x-1 text-sm text-gray-500 dark:text-gray-400">
+          <User className="w-4 h-4" />
+          <span>
+            {signedCount}/{totalSignatures}
+          </span>
         </div>
-        <div className="text-right text-sm text-slate-500 dark:text-slate-300 space-y-1">
-          <div className="flex items-center space-x-1 justify-end">
-            <Calendar className="w-4 h-4" />
-            <span>{formatDate(document.createdAt)}</span>
-          </div>
-          {document.expiresAt && (
-            <div className="flex items-center space-x-1 justify-end">
-              <Clock className="w-4 h-4" />
-              <span>{formatDate(document.expiresAt)}</span>
-            </div>
-          )}
+      </div>
+
+      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex items-center space-x-1">
+          <Calendar className="w-4 h-4" />
+          <span>Criado em {formatDate(document.createdAt)}</span>
         </div>
+        {document.expiresAt && (
+          <div className="flex items-center space-x-1">
+            <Clock className="w-4 h-4" />
+            <span>Expira em {formatDate(document.expiresAt)}</span>
+          </div>
+        )}
       </div>
     </Link>
   );
