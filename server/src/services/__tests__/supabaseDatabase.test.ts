@@ -459,6 +459,183 @@ describe('SupabaseDatabase', () => {
 
       expect(result).not.toBeNull();
     });
+
+    it('should handle signature creation error and rollback', async () => {
+      const mockDoc = {
+        id: '1',
+        title: 'New Doc',
+        description: 'Description',
+        status: 'pending',
+        created_by: 'user-1',
+      };
+
+      const insertChain = {
+        insert: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        single: jest.fn().mockResolvedValue({
+          data: mockDoc,
+          error: null,
+        }),
+      };
+
+      const deleteChain = {
+        delete: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({
+          data: null,
+          error: null,
+        }),
+      };
+
+      const signaturesInsertChain = {
+        insert: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'Signature creation failed' },
+        }),
+      };
+
+      let callCount = 0;
+      (supabaseAdmin.from as jest.Mock).mockImplementation((table) => {
+        if (table === 'documents') {
+          callCount++;
+          if (callCount === 1) {
+            return insertChain;
+          }
+          return deleteChain;
+        }
+        if (table === 'signatures') {
+          return signaturesInsertChain;
+        }
+        return {};
+      });
+
+      const document = {
+        title: 'New Doc',
+        description: 'Description',
+        status: 'pending' as const,
+        signatures: [
+          { userName: 'User', userEmail: 'user@test.com' },
+        ],
+      };
+
+      await expect(createDocument(document, 'user-1')).rejects.toThrow('Erro ao criar assinaturas');
+    });
+  });
+
+  describe('updateDocument', () => {
+    it('should handle update errors', async () => {
+      const updateChain = {
+        update: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'Update failed' },
+        }),
+      };
+
+      (supabaseAdmin.from as jest.Mock).mockReturnValue(updateChain);
+
+      await expect(updateDocument('1', { title: 'Updated' })).rejects.toThrow('Erro ao atualizar documento');
+    });
+  });
+
+  describe('signDocument', () => {
+    it('should handle signature update errors', async () => {
+      const updateChain = {
+        update: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+      };
+
+      (supabaseAdmin.from as jest.Mock).mockImplementation((table) => {
+        if (table === 'signatures') {
+          return {
+            update: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+          };
+        }
+        return {};
+      });
+
+      const updateErrorChain = {
+        update: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+      };
+
+      (supabaseAdmin.from as jest.Mock).mockImplementation((table) => {
+        if (table === 'signatures') {
+          return {
+            update: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockResolvedValue({
+              data: null,
+              error: { message: 'Update failed' },
+            }),
+          };
+        }
+        return {};
+      });
+
+      await expect(signDocument('1', 'sig-1')).rejects.toThrow('Erro ao assinar documento');
+    });
+
+    it('should update document status when all signatures are signed', async () => {
+      const mockSignedDoc = {
+        id: '1',
+        title: 'Doc 1',
+        description: 'Description',
+        status: 'signed',
+        created_by_profile: { id: 'user-1', name: 'User', email: 'user@test.com' },
+        signatures: [{ id: 'sig-1', status: 'signed' }],
+      };
+
+      let callCount = 0;
+      (supabaseAdmin.from as jest.Mock).mockImplementation((table) => {
+        if (table === 'signatures') {
+          callCount++;
+          if (callCount === 1) {
+            // Primeira chamada: update signature
+            return {
+              update: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockResolvedValue({
+                data: null,
+                error: null,
+              }),
+            };
+          } else {
+            // Segunda chamada: select signatures
+            return {
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockResolvedValue({
+                data: [{ status: 'signed' }, { status: 'signed' }],
+                error: null,
+              }),
+            };
+          }
+        }
+        if (table === 'documents') {
+          // Update document status
+          return {
+            update: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockResolvedValue({
+              data: null,
+              error: null,
+            }),
+          };
+        }
+        // getDocumentById
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({
+            data: mockSignedDoc,
+            error: null,
+          }),
+        };
+      });
+
+      const result = await signDocument('1', 'sig-1', 'Signed!');
+
+      expect(result).not.toBeNull();
+    });
   });
 });
 

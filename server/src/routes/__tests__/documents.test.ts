@@ -2,6 +2,8 @@ import request from 'supertest';
 import express from 'express';
 import documentsRouter from '../documents';
 import { supabaseAdmin } from '../../config/supabase';
+import * as db from '../../services/supabaseDatabase';
+import { createLLMProvider } from '../../services/llm/index';
 
 // Mock do supabaseAdmin
 jest.mock('../../config/supabase', () => ({
@@ -11,6 +13,14 @@ jest.mock('../../config/supabase', () => ({
     },
     from: jest.fn(),
   },
+}));
+
+// Mock do supabaseDatabase
+jest.mock('../../services/supabaseDatabase');
+
+// Mock do LLM provider
+jest.mock('../../services/llm/index', () => ({
+  createLLMProvider: jest.fn(),
 }));
 
 // Mock do authMiddleware
@@ -115,6 +125,213 @@ describe('Documents Router', () => {
         .post('/api/documents/test-id/sign')
         .send({});
       expect(response.status).toBe(400);
+    });
+  });
+
+  describe('POST /api/documents/:id/analyze', () => {
+    it('should return 400 when id is missing', async () => {
+      const response = await request(app)
+        .post('/api/documents//analyze');
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 404 for non-existent document', async () => {
+      (db.getDocumentById as jest.Mock).mockResolvedValue(null);
+
+      const response = await request(app)
+        .post('/api/documents/non-existent/analyze');
+      expect(response.status).toBe(404);
+    });
+
+    it('should analyze document successfully', async () => {
+      const mockDocument = {
+        id: 'doc-1',
+        title: 'Test Document',
+        description: 'Test Description',
+        status: 'pending',
+        createdBy: { id: 'user-1', name: 'User', email: 'user@test.com', avatar: '👤' },
+        signatures: [],
+      };
+
+      const mockAnalysis = {
+        summary: 'Test analysis',
+        keyPoints: ['Point 1', 'Point 2'],
+      };
+
+      (db.getDocumentById as jest.Mock).mockResolvedValue(mockDocument);
+      (createLLMProvider as jest.Mock).mockReturnValue({
+        analyzeDocument: jest.fn().mockResolvedValue(mockAnalysis),
+      });
+
+      const response = await request(app)
+        .post('/api/documents/doc-1/analyze');
+      
+      expect(response.status).toBe(200);
+      expect(response.body.summary).toBe('Test analysis');
+    });
+
+    it('should return 400 when document has no content', async () => {
+      const mockDocument = {
+        id: 'doc-1',
+        title: '',
+        description: '',
+        status: 'pending',
+        createdBy: { id: 'user-1', name: 'User', email: 'user@test.com', avatar: '👤' },
+        signatures: [],
+      };
+
+      (db.getDocumentById as jest.Mock).mockResolvedValue(mockDocument);
+
+      const response = await request(app)
+        .post('/api/documents/doc-1/analyze');
+      
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Documento não possui conteúdo para análise');
+    });
+  });
+
+  describe('POST /api/documents/:id/summary', () => {
+    it('should return 404 for non-existent document', async () => {
+      (db.getDocumentById as jest.Mock).mockResolvedValue(null);
+
+      const response = await request(app)
+        .post('/api/documents/non-existent/summary');
+      expect(response.status).toBe(404);
+    });
+
+    it('should generate summary successfully', async () => {
+      const mockDocument = {
+        id: 'doc-1',
+        title: 'Test Document',
+        description: 'Test Description',
+        status: 'pending',
+        createdBy: { id: 'user-1', name: 'User', email: 'user@test.com', avatar: '👤' },
+        signatures: [],
+      };
+
+      const mockSummary = 'This is a summary';
+
+      (db.getDocumentById as jest.Mock).mockResolvedValue(mockDocument);
+      (createLLMProvider as jest.Mock).mockReturnValue({
+        generateSummary: jest.fn().mockResolvedValue(mockSummary),
+      });
+
+      const response = await request(app)
+        .post('/api/documents/doc-1/summary');
+      
+      expect(response.status).toBe(200);
+      expect(response.body.summary).toBe(mockSummary);
+    });
+  });
+
+  describe('POST /api/documents/:id/suggestions', () => {
+    it('should return 404 for non-existent document', async () => {
+      (db.getDocumentById as jest.Mock).mockResolvedValue(null);
+
+      const response = await request(app)
+        .post('/api/documents/non-existent/suggestions');
+      expect(response.status).toBe(404);
+    });
+
+    it('should generate suggestions successfully', async () => {
+      const mockDocument = {
+        id: 'doc-1',
+        title: 'Test Document',
+        description: 'Test Description',
+        status: 'pending',
+        createdBy: { id: 'user-1', name: 'User', email: 'user@test.com', avatar: '👤' },
+        signatures: [],
+      };
+
+      const mockSuggestions = ['Suggestion 1', 'Suggestion 2'];
+
+      (db.getDocumentById as jest.Mock).mockResolvedValue(mockDocument);
+      (createLLMProvider as jest.Mock).mockReturnValue({
+        suggestImprovements: jest.fn().mockResolvedValue(mockSuggestions),
+      });
+
+      const response = await request(app)
+        .post('/api/documents/doc-1/suggestions');
+      
+      expect(response.status).toBe(200);
+      expect(response.body.suggestions).toEqual(mockSuggestions);
+    });
+  });
+
+  describe('POST /api/documents/:id/compliance', () => {
+    it('should return 404 for non-existent document', async () => {
+      (db.getDocumentById as jest.Mock).mockResolvedValue(null);
+
+      const response = await request(app)
+        .post('/api/documents/non-existent/compliance')
+        .send({ rules: [] });
+      expect(response.status).toBe(404);
+    });
+
+    it('should check compliance successfully', async () => {
+      const mockDocument = {
+        id: 'doc-1',
+        title: 'Test Document',
+        description: 'Test Description',
+        status: 'pending',
+        createdBy: { id: 'user-1', name: 'User', email: 'user@test.com', avatar: '👤' },
+        signatures: [],
+      };
+
+      const mockCompliance = {
+        compliant: true,
+        issues: [],
+      };
+
+      (db.getDocumentById as jest.Mock).mockResolvedValue(mockDocument);
+      (createLLMProvider as jest.Mock).mockReturnValue({
+        checkCompliance: jest.fn().mockResolvedValue(mockCompliance),
+      });
+
+      const response = await request(app)
+        .post('/api/documents/doc-1/compliance')
+        .send({ rules: ['Rule 1', 'Rule 2'] });
+      
+      expect(response.status).toBe(200);
+      expect(response.body.compliant).toBe(true);
+    });
+  });
+
+  describe('Error handling', () => {
+    it('should handle errors when getting documents', async () => {
+      (db.getAllDocuments as jest.Mock).mockRejectedValue(new Error('Database error'));
+
+      const response = await request(app).get('/api/documents');
+      expect(response.status).toBe(500);
+    });
+
+    it('should handle errors when creating document', async () => {
+      (db.createDocument as jest.Mock).mockRejectedValue(new Error('Creation error'));
+
+      const newDoc = {
+        title: 'Test Document',
+        description: 'Test Description',
+        signatures: [{ userName: 'John', userEmail: 'john@test.com' }],
+      };
+
+      const response = await request(app).post('/api/documents').send(newDoc);
+      expect(response.status).toBe(500);
+    });
+
+    it('should handle errors when updating document', async () => {
+      (db.updateDocument as jest.Mock).mockRejectedValue(new Error('Update error'));
+
+      const response = await request(app)
+        .put('/api/documents/doc-1')
+        .send({ title: 'Updated' });
+      expect(response.status).toBe(500);
+    });
+
+    it('should handle errors when deleting document', async () => {
+      (db.deleteDocument as jest.Mock).mockRejectedValue(new Error('Delete error'));
+
+      const response = await request(app).delete('/api/documents/doc-1');
+      expect(response.status).toBe(500);
     });
   });
 });

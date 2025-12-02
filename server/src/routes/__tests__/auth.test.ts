@@ -87,6 +87,11 @@ describe('Auth Router', () => {
         error: null,
       });
 
+      (supabaseAdmin.auth.admin.generateLink as jest.Mock).mockResolvedValue({
+        data: { properties: {} },
+        error: null,
+      });
+
       const upsertChain = {
         upsert: jest.fn().mockResolvedValue({ data: null, error: null }),
       };
