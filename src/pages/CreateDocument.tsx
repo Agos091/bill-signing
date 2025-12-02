@@ -12,6 +12,7 @@ export function CreateDocument() {
   const [description, setDescription] = useState('');
   const [expiresAt, setExpiresAt] = useState('');
   const [signatures, setSignatures] = useState<Array<{ userEmail: string; userName: string }>>([]);
+  const [signaturesError, setSignaturesError] = useState(false);
   const [newSignatureEmail, setNewSignatureEmail] = useState('');
   const [newSignatureName, setNewSignatureName] = useState('');
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
@@ -28,12 +29,17 @@ export function CreateDocument() {
     }
 
     setSignatures([...signatures, { userEmail: newSignatureEmail, userName: newSignatureName }]);
+    setSignaturesError(false);
     setNewSignatureEmail('');
     setNewSignatureName('');
   };
 
   const handleRemoveSignature = (email: string) => {
-    setSignatures(signatures.filter((s) => s.userEmail !== email));
+    const updated = signatures.filter((s) => s.userEmail !== email);
+    setSignatures(updated);
+    if (updated.length === 0) {
+      setSignaturesError(true);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,6 +59,7 @@ export function CreateDocument() {
 
     if (signatures.length === 0) {
       toast.error('Adicione pelo menos uma assinatura');
+      setSignaturesError(true);
       return;
     }
 
@@ -156,9 +163,16 @@ export function CreateDocument() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Signatários *
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Signatários *
+            </label>
+            {signaturesError && (
+              <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+                Adicione pelo menos um signatário
+              </span>
+            )}
+          </div>
           
           <div className="space-y-3 mb-4">
             {signatures.map((sig) => (
