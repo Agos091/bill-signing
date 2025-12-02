@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_20", "python311", "pkg-config"]
+nixPkgs = ["nodejs_20", "python311", "pkg-config", "yarn-1_x"]
 
 [phases.install]
 cmds = ["cd server && yarn install"]
