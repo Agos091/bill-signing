@@ -198,6 +198,7 @@ router.post('/:id/sign', async (req: Request, res: Response) => {
 router.post('/:id/analyze', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = req.user!.id;
 
     if (!id) {
       return res.status(400).json({ error: 'ID do documento é obrigatório' });
@@ -207,6 +208,11 @@ router.post('/:id/analyze', async (req: Request, res: Response) => {
 
     if (!document) {
       return res.status(404).json({ error: 'Documento não encontrado' });
+    }
+
+    // Verifica se o documento pertence ao usuário logado
+    if (document.createdBy.id !== userId) {
+      return res.status(403).json({ error: 'Acesso negado: este documento não pertence a você' });
     }
 
     const content = `${document.title}\n\n${document.description}`;
