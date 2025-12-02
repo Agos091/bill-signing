@@ -289,8 +289,9 @@ describe('SupabaseDatabase', () => {
         title: 'New Doc',
         description: 'Description',
         status: 'pending' as const,
+        createdBy: { id: 'user-1', name: 'User', email: 'user@test.com', avatar: '👤' },
         signatures: [
-          { userName: 'User', userEmail: 'user@test.com' },
+          { id: '', userId: '', userName: 'User', userEmail: 'user@test.com', status: 'pending' as const },
         ],
       };
 
@@ -316,6 +317,8 @@ describe('SupabaseDatabase', () => {
         title: 'New Doc',
         description: 'Description',
         status: 'pending' as const,
+        createdBy: { id: 'user-1', name: 'User', email: 'user@test.com', avatar: '👤' },
+        signatures: [],
       };
 
       await expect(createDocument(document, 'user-1')).rejects.toThrow('Erro ao criar documento');
@@ -512,8 +515,9 @@ describe('SupabaseDatabase', () => {
         title: 'New Doc',
         description: 'Description',
         status: 'pending' as const,
+        createdBy: { id: 'user-1', name: 'User', email: 'user@test.com', avatar: '👤' },
         signatures: [
-          { userName: 'User', userEmail: 'user@test.com' },
+          { id: '', userId: '', userName: 'User', userEmail: 'user@test.com', status: 'pending' as const },
         ],
       };
 
@@ -561,14 +565,15 @@ describe('SupabaseDatabase', () => {
 
       (supabaseAdmin.from as jest.Mock).mockImplementation((table) => {
         if (table === 'signatures') {
-          return {
+          const chain = {
             update: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockResolvedValue({
-              data: null,
-              error: { message: 'Update failed' },
-            }),
+            eq: jest.fn(),
           };
+          chain.eq.mockReturnValueOnce(chain).mockReturnValueOnce(chain).mockResolvedValueOnce({
+            data: null,
+            error: { message: 'Update failed' },
+          });
+          return chain;
         }
         return {};
       });
@@ -592,14 +597,15 @@ describe('SupabaseDatabase', () => {
           callCount++;
           if (callCount === 1) {
             // Primeira chamada: update signature
-            return {
+            const updateChain = {
               update: jest.fn().mockReturnThis(),
-              eq: jest.fn().mockReturnThis(),
-              eq: jest.fn().mockResolvedValue({
-                data: null,
-                error: null,
-              }),
+              eq: jest.fn(),
             };
+            updateChain.eq.mockReturnValueOnce(updateChain).mockReturnValueOnce(updateChain).mockResolvedValueOnce({
+              data: null,
+              error: null,
+            });
+            return updateChain;
           } else {
             // Segunda chamada: select signatures
             return {
