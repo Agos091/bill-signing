@@ -46,10 +46,12 @@ describe('Signup', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText(/Criar conta/i)).toBeDefined();
-    expect(screen.getByLabelText(/Nome/i)).toBeDefined();
-    expect(screen.getByLabelText(/Email/i)).toBeDefined();
-    expect(screen.getByLabelText(/Senha/i)).toBeDefined();
+    // Usa getAllByText porque há múltiplos elementos com "Criar conta"
+    expect(screen.getAllByText(/Criar conta/i).length).toBeGreaterThan(0);
+    expect(screen.getByLabelText(/Nome completo/i)).toBeDefined();
+    expect(screen.getByLabelText(/^Email$/i)).toBeDefined();
+    // Usa getAllByLabelText porque há "Senha" e "Confirmar senha"
+    expect(screen.getAllByLabelText(/Senha/i).length).toBeGreaterThan(0);
   });
 
   it('should update name input', () => {
