@@ -12,6 +12,7 @@ import { Settings } from './pages/Settings';
 import { AIAssistant } from './pages/AIAssistant';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
+import { NotFound } from './pages/NotFound';
 
 // Componente de rota protegida
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -161,8 +162,18 @@ function AppRoutes() {
         }
       />
 
-      {/* Redireciona rotas não encontradas para home */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route
+        path="*"
+        element={
+          <ProtectedRoute>
+            <AppProvider>
+              <Layout>
+                <NotFound />
+              </Layout>
+            </AppProvider>
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
